@@ -171,8 +171,8 @@ PersistentCache::StatsType BlockCacheTier::Stats() {
 }
 
 Status BlockCacheTier::Insert(const Slice& key, const char* data,
-                              const size_t size,std::string ) {
-  //fprintf(stderr,"BlockCacheTier Insert size=%ld\n",size);
+                              const size_t size, std::string) {
+  // fprintf(stderr,"BlockCacheTier Insert size=%ld\n",size);
   // update stats
 
   stats_.bytes_pipelined_.Add(size);
@@ -265,7 +265,7 @@ Status BlockCacheTier::InsertImpl(const Slice& key, const Slice& data) {
 }
 
 Status BlockCacheTier::Lookup(const Slice& key, std::unique_ptr<char[]>* val,
-                              size_t* size,std::string ) {
+                              size_t* size, std::string) {
   StopWatchNano timer(opt_.env, /*auto_start=*/true);
 
   LBA lba;
@@ -398,7 +398,7 @@ Status NewPersistentCache(Env* const env, const std::string& path,
   if (!cache) {
     return Status::IOError("invalid argument cache");
   }
-fprintf(stderr,"in NewPersistentCache\n");
+  fprintf(stderr, "in NewPersistentCache\n");
   auto opt = PersistentCacheConfig(env, path, size, log);
   if (optimized_for_nvm) {
     // the default settings are optimized for SSD
@@ -423,15 +423,14 @@ fprintf(stderr,"in NewPersistentCache\n");
 // wp
 
 Status SST_space::Get(const std::string key, std::unique_ptr<char[]>* data,
-                       size_t* size) 
-{
+                      size_t* size) {
   if (!cache.count(key)) {
     return Status::NotFound("Mycache not found");
   }
   DLinkedNode* node = cache[key];
   moveToHead(node);
   data->reset(new char[node->value.size]);
-  *size=node->value.size;
+  *size = node->value.size;
   size_t cur = 0;
   for (uint32_t i = 0; i < (node->value.offset.size() - 1); i++) {
     fseek(fp, begin + node->value.offset[i], SEEK_SET);
@@ -494,15 +493,16 @@ std::string SST_space::Get(std::string key) {
   return re;
 }
 
-Status SST_space::Put(const std::string key, const char* data, const size_t size) {
+Status SST_space::Put(const std::string key, const char* data,
+                      const size_t size) {
   if (size == 0) {
     return Status::OK();
   }
-  //fprintf(stderr,"test1\n");
+  // fprintf(stderr,"test1\n");
   uint32_t need_num = size / SPACE_SIZE;
   need_num += size % SPACE_SIZE == 0 ? 0 : 1;
   if (need_num > all_num) {
-    printf("too large size=%ld\n",size);
+   // printf("too large size=%ld\n", size);
     return Status::OK();
   }
   DLinkedNode* node;
@@ -531,7 +531,7 @@ Status SST_space::Put(const std::string key, const char* data, const size_t size
       delete removed;
     }
   }
-  //fprintf(stderr,"test2\n");
+  // fprintf(stderr,"test2\n");
   //取块
   uint32_t num = 0, j = 0;
   while (j < bit_map.size()) {
@@ -545,7 +545,7 @@ Status SST_space::Put(const std::string key, const char* data, const size_t size
     }
     j++;
   }
-  //fprintf(stderr,"test3\n");
+  // fprintf(stderr,"test3\n");
   //写块
   size_t cur = 0;
   for (uint32_t i = 0; i < node->value.offset.size() - 1; i++) {
@@ -553,20 +553,20 @@ Status SST_space::Put(const std::string key, const char* data, const size_t size
     fwrite(data + cur, SPACE_SIZE, 1, fp);
     cur += SPACE_SIZE;
   }
-  //fprintf(stderr,"test3.1\n");
+  // fprintf(stderr,"test3.1\n");
   node->value.size = size;
-  size_t left_size =
-      size % SPACE_SIZE == 0 ? SPACE_SIZE : size % SPACE_SIZE;
-  //fprintf(stderr,"test3.2\n");
+  size_t left_size = size % SPACE_SIZE == 0 ? SPACE_SIZE : size % SPACE_SIZE;
+  // fprintf(stderr,"test3.2\n");
   int index = node->value.offset.size() - 1;
   fseek(fp, begin + node->value.offset[index], SEEK_SET);
-  //fprintf(stderr,"test3.3  left_size=%ld cur=%ld size=%ld\n",left_size,cur,size);
+  // fprintf(stderr,"test3.3  left_size=%ld cur=%ld
+  // size=%ld\n",left_size,cur,size);
   fwrite(data + cur, left_size, 1, fp);
-  //fprintf(stderr,"test4\n");
+  // fprintf(stderr,"test4\n");
   empty_num -= need_num;
   return Status::OK();
 }
-void SST_space::Put(std::string key, std::string value) {
+void SST_space::Put(const std::string& key, const std::string& value) {
   // printf("put key size=%ld value size=%ld\n",key.size(),value.size());
   // printf("val==: %s\n",value.c_str());
   if (value.size() == 0) {
@@ -575,7 +575,7 @@ void SST_space::Put(std::string key, std::string value) {
   uint32_t need_num = value.size() / SPACE_SIZE;
   need_num += value.size() % SPACE_SIZE == 0 ? 0 : 1;
   if (need_num > all_num) {
-    printf("too large size=%ld\n",value.size());
+    //printf("too large size=%ld\n", value.size());
     return;
   }
   DLinkedNode* node;
@@ -633,48 +633,64 @@ void SST_space::Put(std::string key, std::string value) {
 
   empty_num -= need_num;
 }
-
-Status myCache::Insert(const Slice& key, const char* data, const size_t size,std::string fname) {
+Status myCache::InsertImpl(const Slice& key, const char* data, const size_t size,
+                  std::string fname) {
   WriteLock _(&lock_);
-  //fprintf(stderr,"myCache Insert size=%ld\n",size);
+   fprintf(stderr,"myCache Insert size=%ld\n",size);
   std::string skey(key.data(), key.size());
-  int index=getIndex(fname);
-  return v[index].Put(skey,data,size);
+  int index = getIndex(fname);
+  //fprintf(stderr,"index=%d\n NUM=%d",index,NUM);
+  Status s=v[index].Put(skey, data, size);
+  return s;
+}
+
+Status myCache::Insert(const Slice& key, const char* data, const size_t size,
+                       std::string fname) {
+  if (opt_.pipeline_writes) {
+    insert_ops_.Push(myInsertOp(key.ToString(),std::move(std::string(data, size)),
+    std::move(fname)));
+    return Status::OK();
+  }
+  return InsertImpl(key, data, size, fname);
+}
+void myCache::InsertMain() {
+  while (true) {
+    myInsertOp op(insert_ops_.Pop());
+
+    if (op.signal_) {
+      // that is a secret signal to exit
+      break;
+    }
+    Insert2(op.key_,op.value_,op.fname_);
+  }
 }
 
 Status myCache::Lookup(const Slice& key, std::unique_ptr<char[]>* data,
-                       size_t* size ,std::string fname) {
-   WriteLock _(&lock_);
-  //fprintf(stderr,"Lookup\n");
+                       size_t* size, std::string fname) {
+  WriteLock _(&lock_);
+   //fprintf(stderr,"Lookup\n");
   std::string skey(key.data(), key.size());
-  int index=getIndex(fname);
-  return v[index].Get(skey,data,size);
+  int index = getIndex(fname);
+  Status s=v[index].Get(skey, data, size);
+  return s;
 }
 
-Status myCache::Insert2(const Slice& key, const char* data, const size_t size,
-                        std::string fname) {
+Status myCache::Insert2(const std::string & key, const std::string& value,
+                        std::string &fname) {
+  //fprintf(stderr,"myCache Insert2 size=%ld\n",value.size());        
   WriteLock _(&lock_);
-  std::string skey(key.data(), key.size());
-  std::string svalue(data, size);
-  Put(fname, skey, svalue);
+  int index = getIndex(fname);
+  //fprintf(stderr,"index=%d\n NUM=%d",index,NUM);
+  v[index].Put(key,value);
   return Status::OK();
 }
 
-Status myCache::Lookup2(const Slice& key, std::unique_ptr<char[]>* data,
-                        size_t* size, std::string fname) {
-  WriteLock _(&lock_);
-  std::string skey(key.data(), key.size());
-  std::string svalue = Get(fname, skey);
-  *size = svalue.size();
-  data->reset(new char[svalue.size()]);
-  memcpy(data->get(), svalue.c_str(), svalue.size());
-  return Status::OK();
-}
+
 Status myCache::Open() {
   WriteLock _(&lock_);
-  std::string path=opt_.path;
-  path+="/pcache_file";
-  printf("paht=%s\n",path.c_str());
+  std::string path = opt_.path;
+  path += "/pcache_file";
+  printf("paht=%s\n", path.c_str());
   fp = fopen(path.c_str(), "w+");
   if (fp == NULL) {
     printf("error open\n");
@@ -696,16 +712,23 @@ Status myCache::Open() {
   // for (int i = 0; i < NUM; i++) {
   //   v[i].Set_Par(fp, opt_.cache_size / SPACE_SIZE, i * SST_SIZE);
   // }
-  NUM=opt_.cache_size/SST_SIZE;
+  NUM = opt_.cache_size / SST_SIZE;
   v.resize(NUM);
-  for(int i=0;i<NUM;i++)
-  {
-      v[i].Set_Par(fp,SST_SIZE/SPACE_SIZE,i*SST_SIZE);
+  for (int i = 0; i < NUM; i++) {
+    v[i].Set_Par(fp, SST_SIZE / SPACE_SIZE, i * SST_SIZE);
+  }
+  if (opt_.pipeline_writes) {
+    insert_th_ = port::Thread(&myCache::InsertMain, this);
   }
   return Status::OK();
 }
 Status myCache::Close() {
   WriteLock _(&lock_);
+  if (opt_.pipeline_writes && insert_th_.joinable()) {
+    myInsertOp op(/*quit=*/true);
+    insert_ops_.Push(std::move(op));
+    insert_th_.join();
+  }
   fclose(fp);
   return Status::OK();
 }
