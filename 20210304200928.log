@@ -1,0 +1,25 @@
+Initializing RocksDB Options from the specified file
+Initializing RocksDB Options from command-line flags
+paht=/home/zyh/480G/wp/pcache/pcache_file
+too large size=848523
+too large size=848746
+too large size=848912
+too large size=1231690
+too large size=1232074
+too large size=1232202
+Keys:       16 bytes each
+Values:     256 bytes each (128 bytes after compression)
+Entries:    2000000
+Prefix:    0 bytes
+Keys per prefix:    0
+RawSize:    518.8 MB (estimated)
+FileSize:   274.7 MB (estimated)
+Write rate: 0 bytes/second
+Read rate: 0 ops/second
+Compression: NoCompression
+Compression sampling rate: 0
+Memtablerep: skip_list
+Perf Level: 5
+WARNING: Assertions are enabled; benchmarks unnecessarily slow
+------------------------------------------------
+DB path: [/home/zyh/480G/wp]

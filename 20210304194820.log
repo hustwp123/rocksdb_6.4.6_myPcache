@@ -1,0 +1,507 @@
+Initializing RocksDB Options from the specified file
+Initializing RocksDB Options from command-line flags
+Keys:       16 bytes each
+Values:     256 bytes each (128 bytes after compression)
+Entries:    2000000
+Prefix:    0 bytes
+Keys per prefix:    0
+RawSize:    518.8 MB (estimated)
+FileSize:   274.7 MB (estimated)
+Write rate: 0 bytes/second
+Read rate: 0 ops/second
+Compression: NoCompression
+Compression sampling rate: 0
+Memtablerep: skip_list
+Perf Level: 5
+WARNING: Assertions are enabled; benchmarks unnecessarily slow
+------------------------------------------------
+DB path: [/home/zyh/480G/wp]
+readrandom   :      30.126 micros/op 131862 ops/sec;   34.2 MB/s (2000000 of 2000000 found)
+ PERF_CONTEXT:
+user_key_comparison_count = 66295157, block_cache_hit_count = 0, block_read_count = 36238, block_read_byte = 141199910, block_read_time = 631761580, block_cache_index_hit_count = 0, index_block_read_count = 0, block_cache_filter_hit_count = 0, filter_block_read_count = 0, compression_dict_block_read_count = 0, block_checksum_time = 15706330, block_decompress_time = 183293445, get_read_bytes = 512000000, multiget_read_bytes = 0, iter_read_bytes = 0, internal_key_skipped_count = 0, internal_delete_skipped_count = 0, internal_recent_skipped_count = 0, internal_merge_count = 0, write_wal_time = 0, get_snapshot_time = 1236687338, get_from_memtable_time = 0, get_from_memtable_count = 0, get_post_process_time = 434195206, get_from_output_files_time = 53964223466, seek_on_memtable_time = 0, seek_on_memtable_count = 0, next_on_memtable_count = 0, prev_on_memtable_count = 0, seek_child_seek_time = 0, seek_child_seek_count = 0, seek_min_heap_time = 0, seek_internal_seek_time = 0, find_next_user_entry_time = 0, write_pre_and_post_process_time = 0, write_memtable_time = 0, write_thread_wait_nanos = 0, write_scheduling_flushes_compactions_time = 0, db_mutex_lock_nanos = 323, db_condition_wait_nanos = 0, merge_operator_time_nanos = 0, write_delay_time = 0, read_index_block_nanos = 0, read_filter_block_nanos = 0, new_table_block_iter_nanos = 45257186164, new_table_iterator_nanos = 0, block_seek_nanos = 2429507497, find_table_nanos = 0, bloom_memtable_hit_count = 0, bloom_memtable_miss_count = 0, bloom_sst_hit_count = 2000000, bloom_sst_miss_count = 0, key_lock_wait_time = 0, key_lock_wait_count = 0, env_new_sequential_file_nanos = 0, env_new_random_access_file_nanos = 0, env_new_writable_file_nanos = 0, env_reuse_writable_file_nanos = 0, env_new_random_rw_file_nanos = 0, env_new_directory_nanos = 0, env_file_exists_nanos = 0, env_get_children_nanos = 0, env_get_children_file_attributes_nanos = 0, env_delete_file_nanos = 0, env_create_dir_nanos = 0, env_create_dir_if_missing_nanos = 0, env_delete_dir_nanos = 0, env_get_file_size_nanos = 0, env_get_file_modification_time_nanos = 0, env_rename_file_nanos = 0, env_link_file_nanos = 0, env_lock_file_nanos = 0, env_unlock_file_nanos = 0, env_new_logger_nanos = 0, get_cpu_nanos = 40398446401, iter_next_cpu_nanos = 0, iter_prev_cpu_nanos = 0, iter_seek_cpu_nanos = 0, bloom_filter_useful = 0@level6, 0@level7, bloom_filter_full_positive = 2000000@level6, 0@level7, bloom_filter_full_true_positive = 2000000@level6, 0@level7, block_cache_hit_count = 0@level6, 0@level7, block_cache_miss_count = 0@level6, 0@level7, 
+Microseconds per read:
+Count: 8000000 Average: 30.1259  StdDev: 11.91
+Min: 6  Median: 28.5511  Max: 4667
+Percentiles: P50: 28.55 P75: 32.79 P99: 72.09 P99.9: 107.33 P99.99: 187.46
+------------------------------------------------------
+(       4,       6 ]        6   0.000%   0.000% 
+(       6,      10 ]   521109   6.514%   6.514% #
+(      10,      15 ]   301210   3.765%  10.279% #
+(      15,      22 ]    84102   1.051%  11.330% 
+(      22,      34 ]  5666704  70.834%  82.164% ##############
+(      34,      51 ]  1247705  15.596%  97.760% ###
+(      51,      76 ]   117528   1.469%  99.230% 
+(      76,     110 ]    58213   0.728%  99.957% 
+(     110,     170 ]     2496   0.031%  99.988% 
+(     170,     250 ]      582   0.007%  99.996% 
+(     250,     380 ]      165   0.002%  99.998% 
+(     380,     580 ]       19   0.000%  99.998% 
+(     580,     870 ]       43   0.001%  99.999% 
+(     870,    1300 ]       87   0.001% 100.000% 
+(    1300,    1900 ]       17   0.000% 100.000% 
+(    1900,    2900 ]       10   0.000% 100.000% 
+(    2900,    4400 ]        3   0.000% 100.000% 
+(    4400,    6600 ]        1   0.000% 100.000% 
+
+
+
+** Compaction Stats [default] **
+Level    Files   Size     Score Read(GB)  Rn(GB) Rnp1(GB) Write(GB) Wnew(GB) Moved(GB) W-Amp Rd(MB/s) Wr(MB/s) Comp(sec) CompMergeCPU(sec) Comp(cnt) Avg(sec) KeyIn KeyDrop
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  L5     63/0   510.15 MB   1.0      0.0     0.0      0.0       0.0      0.0       0.0   0.0      0.0      0.0      0.00              0.00         0    0.000       0      0
+  L6    104/0   842.10 MB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   0.0      0.0      0.0      0.00              0.00         0    0.000       0      0
+ Sum    167/0    1.32 GB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   0.0      0.0      0.0      0.00              0.00         0    0.000       0      0
+ Int      0/0    0.00 KB   0.0      0.0     0.0      0.0       0.0      0.0       0.0   0.0      0.0      0.0      0.00              0.00         0    0.000       0      0
+
+** Compaction Stats [default] **
+Priority    Files   Size     Score Read(GB)  Rn(GB) Rnp1(GB) Write(GB) Wnew(GB) Moved(GB) W-Amp Rd(MB/s) Wr(MB/s) Comp(sec) CompMergeCPU(sec) Comp(cnt) Avg(sec) KeyIn KeyDrop
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Uptime(secs): 60.8 total, 60.7 interval
+Flush(GB): cumulative 0.000, interval 0.000
+AddFile(GB): cumulative 0.000, interval 0.000
+AddFile(Total Files): cumulative 0, interval 0
+AddFile(L0 Files): cumulative 0, interval 0
+AddFile(Keys): cumulative 0, interval 0
+Cumulative compaction: 0.00 GB write, 0.00 MB/s write, 0.00 GB read, 0.00 MB/s read, 0.0 seconds
+Interval compaction: 0.00 GB write, 0.00 MB/s write, 0.00 GB read, 0.00 MB/s read, 0.0 seconds
+Stalls(count): 0 level0_slowdown, 0 level0_slowdown_with_compaction, 0 level0_numfiles, 0 level0_numfiles_with_compaction, 0 stop for pending_compaction_bytes, 0 slowdown for pending_compaction_bytes, 0 memtable_compaction, 0 memtable_slowdown, interval 0 total count
+
+** File Read Latency Histogram By Level [default] **
+** Level 5 read latency histogram (micros):
+Count: 313 Average: 95.0096  StdDev: 131.03
+Min: 1  Median: 42.9250  Max: 638
+Percentiles: P50: 42.92 P75: 133.89 P99: 523.09 P99.9: 574.31 P99.99: 579.43
+------------------------------------------------------
+[       0,       1 ]       31   9.904%   9.904% ##
+(       1,       2 ]       61  19.489%  29.393% ####
+(       2,       3 ]       25   7.987%  37.380% ##
+(       3,       4 ]        5   1.597%  38.978% 
+(       4,       6 ]        4   1.278%  40.256% 
+(      10,      15 ]        4   1.278%  41.534% 
+(      15,      22 ]       12   3.834%  45.367% #
+(      22,      34 ]        4   1.278%  46.645% 
+(      34,      51 ]       20   6.390%  53.035% #
+(      51,      76 ]       34  10.863%  63.898% ##
+(      76,     110 ]       24   7.668%  71.565% ##
+(     110,     170 ]       27   8.626%  80.192% ##
+(     170,     250 ]       19   6.070%  86.262% #
+(     250,     380 ]       32  10.224%  96.486% ##
+(     380,     580 ]       11   3.514% 100.000% #
+(     580,     870 ]        1   0.319% 100.319% 
+
+** Level 6 read latency histogram (micros):
+Count: 143296 Average: 17.2663  StdDev: 14.31
+Min: 1  Median: 17.8389  Max: 933
+Percentiles: P50: 17.84 P75: 23.98 P99: 47.99 P99.9: 88.45 P99.99: 256.79
+------------------------------------------------------
+[       0,       1 ]       54   0.038%   0.038% 
+(       1,       2 ]      102   0.071%   0.109% 
+(       2,       3 ]     3852   2.688%   2.797% #
+(       3,       4 ]    28868  20.146%  22.943% ####
+(       4,       6 ]    16488  11.506%  34.449% ##
+(       6,      10 ]     1560   1.089%  35.538% 
+(      10,      15 ]      349   0.244%  35.781% 
+(      15,      22 ]    50239  35.060%  70.841% #######
+(      22,      34 ]    36170  25.241%  96.082% #####
+(      34,      51 ]     5080   3.545%  99.627% #
+(      51,      76 ]      368   0.257%  99.884% 
+(      76,     110 ]       62   0.043%  99.927% 
+(     110,     170 ]       51   0.036%  99.963% 
+(     170,     250 ]       37   0.026%  99.989% 
+(     250,     380 ]       32   0.022% 100.011% 
+(     380,     580 ]       26   0.018% 100.029% 
+(     580,     870 ]        5   0.003% 100.033% 
+(     870,    1300 ]        1   0.001% 100.033% 
+
+
+** DB Stats **
+Uptime(secs): 60.8 total, 60.7 interval
+Cumulative writes: 0 writes, 0 keys, 0 commit groups, 0.0 writes per commit group, ingest: 0.00 GB, 0.00 MB/s
+Cumulative WAL: 0 writes, 0 syncs, 0.00 writes per sync, written: 0.00 GB, 0.00 MB/s
+Cumulative stall: 00:00:0.000 H:M:S, 0.0 percent
+Interval writes: 0 writes, 0 keys, 0 commit groups, 0.0 writes per commit group, ingest: 0.00 MB, 0.00 MB/s
+Interval WAL: 0 writes, 0 syncs, 0.00 writes per sync, written: 0.00 MB, 0.00 MB/s
+Interval stall: 00:00:0.000 H:M:S, 0.0 percent
+
+
+Level Files Size(MB)
+--------------------
+  0        0        0
+  1        0        0
+  2        0        0
+  3        0        0
+  4        0        0
+  5       63      510
+  6      104      842
+
+
+--- level 0 --- version# 2 ---
+--- level 1 --- version# 2 ---
+--- level 2 --- version# 2 ---
+--- level 3 --- version# 2 ---
+--- level 4 --- version# 2 ---
+--- level 5 --- version# 2 ---
+ 127:8542117[5142782 .. 5203132]['0000000000273A153030303030303030' seq:5142782, type:1 .. '000000000027AFC53030303030303030' seq:5203132, type:1](0)
+ 128:8546009[5203134 .. 5263417]['000000000027AFC63030303030303030' seq:5203134, type:1 .. '00000000002825843030303030303030' seq:5263417, type:1](0)
+ 129:8542118[5263419 .. 5323674]['00000000002825853030303030303030' seq:5263419, type:1 .. '0000000000289B353030303030303030' seq:5323674, type:1](0)
+ 130:8546008[5323676 .. 5383960]['0000000000289B363030303030303030' seq:5323676, type:1 .. '00000000002910F43030303030303030' seq:5383960, type:1](0)
+ 131:8542118[5383962 .. 5444215]['00000000002910F53030303030303030' seq:5383962, type:1 .. '00000000002986A53030303030303030' seq:5444215, type:1](0)
+ 132:8546010[5444217 .. 5504502]['00000000002986A63030303030303030' seq:5444217, type:1 .. '000000000029FC643030303030303030' seq:5504502, type:1](0)
+ 133:8542119[5504504 .. 5564759]['000000000029FC653030303030303030' seq:5504504, type:1 .. '00000000002A72153030303030303030' seq:5564759, type:1](0)
+ 134:8546009[5564761 .. 5625047]['00000000002A72163030303030303030' seq:5564761, type:1 .. '00000000002AE7D43030303030303030' seq:5625047, type:1](0)
+ 135:8542119[5625049 .. 5685305]['00000000002AE7D53030303030303030' seq:5625049, type:1 .. '00000000002B5D853030303030303030' seq:5685305, type:1](0)
+ 136:8546010[5685307 .. 5745591]['00000000002B5D863030303030303030' seq:5685307, type:1 .. '00000000002BD3443030303030303030' seq:5745591, type:1](0)
+ 137:8542118[5745593 .. 5805847]['00000000002BD3453030303030303030' seq:5745593, type:1 .. '00000000002C48F53030303030303030' seq:5805847, type:1](0)
+ 138:8546010[5805849 .. 5866133]['00000000002C48F63030303030303030' seq:5805849, type:1 .. '00000000002CBEB43030303030303030' seq:5866133, type:1](0)
+ 139:8542119[5866135 .. 5926391]['00000000002CBEB53030303030303030' seq:5866135, type:1 .. '00000000002D34653030303030303030' seq:5926391, type:1](0)
+ 140:8546010[5926393 .. 5986677]['00000000002D34663030303030303030' seq:5926393, type:1 .. '00000000002DAA243030303030303030' seq:5986677, type:1](0)
+ 141:8542118[5986679 .. 6046934]['00000000002DAA253030303030303030' seq:5986679, type:1 .. '00000000002E1FD53030303030303030' seq:6046934, type:1](0)
+ 142:8546010[6046936 .. 6107220]['00000000002E1FD63030303030303030' seq:6046936, type:1 .. '00000000002E95943030303030303030' seq:6107220, type:1](0)
+ 143:8542119[6107222 .. 6167477]['00000000002E95953030303030303030' seq:6107222, type:1 .. '00000000002F0B453030303030303030' seq:6167477, type:1](0)
+ 144:8546012[6167479 .. 6227761]['00000000002F0B463030303030303030' seq:6167479, type:1 .. '00000000002F81043030303030303030' seq:6227761, type:1](0)
+ 145:8542117[6227763 .. 6288018]['00000000002F81053030303030303030' seq:6227763, type:1 .. '00000000002FF6B53030303030303030' seq:6288018, type:1](0)
+ 146:8546013[6288020 .. 6348304]['00000000002FF6B63030303030303030' seq:6288020, type:1 .. '0000000000306C743030303030303030' seq:6348304, type:1](0)
+ 147:8542118[6348306 .. 6408562]['0000000000306C753030303030303030' seq:6348306, type:1 .. '000000000030E2253030303030303030' seq:6408562, type:1](0)
+ 148:8546012[6408564 .. 6468856]['000000000030E2263030303030303030' seq:6408564, type:1 .. '00000000003157E43030303030303030' seq:6468856, type:1](0)
+ 149:8542118[6468858 .. 6529122]['00000000003157E53030303030303030' seq:6468858, type:1 .. '000000000031CD953030303030303030' seq:6529122, type:1](0)
+ 150:8546011[6529124 .. 6589417]['000000000031CD963030303030303030' seq:6529124, type:1 .. '00000000003243543030303030303030' seq:6589417, type:1](0)
+ 151:8542118[6589419 .. 6649682]['00000000003243553030303030303030' seq:6589419, type:1 .. '000000000032B9053030303030303030' seq:6649682, type:1](0)
+ 152:8546010[6649684 .. 6709971]['000000000032B9063030303030303030' seq:6649684, type:1 .. '0000000000332EC43030303030303030' seq:6709971, type:1](0)
+ 153:8542118[6709973 .. 6770232]['0000000000332EC53030303030303030' seq:6709973, type:1 .. '000000000033A4753030303030303030' seq:6770232, type:1](0)
+ 154:8546011[6770234 .. 6830524]['000000000033A4763030303030303030' seq:6770234, type:1 .. '0000000000341A343030303030303030' seq:6830524, type:1](0)
+ 164:8542117[0 .. 0]['0000000000341A353030303030303030' seq:0, type:1 .. '0000000000348FE53030303030303030' seq:0, type:1](0)
+ 165:8546011[0 .. 0]['0000000000348FE63030303030303030' seq:0, type:1 .. '00000000003505A43030303030303030' seq:0, type:1](0)
+ 166:8542118[0 .. 0]['00000000003505A53030303030303030' seq:0, type:1 .. '0000000000357B553030303030303030' seq:0, type:1](0)
+ 167:8546010[0 .. 0]['0000000000357B563030303030303030' seq:0, type:1 .. '000000000035F1143030303030303030' seq:0, type:1](0)
+ 168:8542118[0 .. 0]['000000000035F1153030303030303030' seq:0, type:1 .. '00000000003666C53030303030303030' seq:0, type:1](0)
+ 169:8546010[0 .. 0]['00000000003666C63030303030303030' seq:0, type:1 .. '000000000036DC843030303030303030' seq:0, type:1](0)
+ 170:8542119[0 .. 0]['000000000036DC853030303030303030' seq:0, type:1 .. '00000000003752353030303030303030' seq:0, type:1](0)
+ 171:8546009[0 .. 0]['00000000003752363030303030303030' seq:0, type:1 .. '000000000037C7F43030303030303030' seq:0, type:1](0)
+ 172:8542119[0 .. 0]['000000000037C7F53030303030303030' seq:0, type:1 .. '0000000000383DA53030303030303030' seq:0, type:1](0)
+ 173:8546010[0 .. 0]['0000000000383DA63030303030303030' seq:0, type:1 .. '000000000038B3643030303030303030' seq:0, type:1](0)
+ 174:8542119[0 .. 0]['000000000038B3653030303030303030' seq:0, type:1 .. '00000000003929153030303030303030' seq:0, type:1](0)
+ 175:8546009[0 .. 0]['00000000003929163030303030303030' seq:0, type:1 .. '0000000000399ED43030303030303030' seq:0, type:1](0)
+ 206:8546009[0 .. 0]['00000000004170063030303030303030' seq:0, type:1 .. '000000000041E5C43030303030303030' seq:0, type:1](0)
+ 207:8542119[0 .. 0]['000000000041E5C53030303030303030' seq:0, type:1 .. '0000000000425B753030303030303030' seq:0, type:1](0)
+ 208:8546010[0 .. 0]['0000000000425B763030303030303030' seq:0, type:1 .. '000000000042D1343030303030303030' seq:0, type:1](0)
+ 209:8542118[0 .. 0]['000000000042D1353030303030303030' seq:0, type:1 .. '00000000004346E53030303030303030' seq:0, type:1](0)
+ 210:8546010[0 .. 0]['00000000004346E63030303030303030' seq:0, type:1 .. '000000000043BCA43030303030303030' seq:0, type:1](0)
+ 211:8542119[0 .. 0]['000000000043BCA53030303030303030' seq:0, type:1 .. '00000000004432553030303030303030' seq:0, type:1](0)
+ 212:8546010[0 .. 0]['00000000004432563030303030303030' seq:0, type:1 .. '000000000044A8143030303030303030' seq:0, type:1](0)
+ 213:8542118[0 .. 0]['000000000044A8153030303030303030' seq:0, type:1 .. '0000000000451DC53030303030303030' seq:0, type:1](0)
+ 215:8542119[0 .. 0]['00000000004593853030303030303030' seq:0, type:1 .. '00000000004609353030303030303030' seq:0, type:1](0)
+ 216:8546009[0 .. 0]['00000000004609363030303030303030' seq:0, type:1 .. '0000000000467EF43030303030303030' seq:0, type:1](0)
+ 217:8542118[0 .. 0]['0000000000467EF53030303030303030' seq:0, type:1 .. '000000000046F4A53030303030303030' seq:0, type:1](0)
+ 218:8546011[0 .. 0]['000000000046F4A63030303030303030' seq:0, type:1 .. '0000000000476A643030303030303030' seq:0, type:1](0)
+ 219:8542118[0 .. 0]['0000000000476A653030303030303030' seq:0, type:1 .. '000000000047E0153030303030303030' seq:0, type:1](0)
+ 220:8546010[0 .. 0]['000000000047E0163030303030303030' seq:0, type:1 .. '00000000004855D43030303030303030' seq:0, type:1](0)
+ 221:8542118[0 .. 0]['00000000004855D53030303030303030' seq:0, type:1 .. '000000000048CB853030303030303030' seq:0, type:1](0)
+ 222:8546011[0 .. 0]['000000000048CB863030303030303030' seq:0, type:1 .. '00000000004941443030303030303030' seq:0, type:1](0)
+ 223:8542117[0 .. 0]['00000000004941453030303030303030' seq:0, type:1 .. '000000000049B6F53030303030303030' seq:0, type:1](0)
+ 224:8546011[0 .. 0]['000000000049B6F63030303030303030' seq:0, type:1 .. '00000000004A2CB43030303030303030' seq:0, type:1](0)
+ 225:8542118[0 .. 0]['00000000004A2CB53030303030303030' seq:0, type:1 .. '00000000004AA2653030303030303030' seq:0, type:1](0)
+ 226:8546011[0 .. 0]['00000000004AA2663030303030303030' seq:0, type:1 .. '00000000004B18243030303030303030' seq:0, type:1](0)
+ 227:8542117[0 .. 0]['00000000004B18253030303030303030' seq:0, type:1 .. '00000000004B8DD53030303030303030' seq:0, type:1](0)
+ 228:8546011[0 .. 0]['00000000004B8DD63030303030303030' seq:0, type:1 .. '00000000004C03943030303030303030' seq:0, type:1](0)
+ 229:5201872[0 .. 0]['00000000004C03953030303030303030' seq:0, type:1 .. '00000000004C4B3F3030303030303030' seq:0, type:1](0)
+--- level 6 --- version# 2 ---
+ 15:8546011[0 .. 0]['00000000000000003030303030303030' seq:0, type:1 .. '00000000000075BE3030303030303030' seq:0, type:1](139264)
+ 16:8542118[0 .. 0]['00000000000075BF3030303030303030' seq:0, type:1 .. '000000000000EB6F3030303030303030' seq:0, type:1](108544)
+ 17:8546011[0 .. 0]['000000000000EB703030303030303030' seq:0, type:1 .. '000000000001612E3030303030303030' seq:0, type:1](119808)
+ 18:8542117[0 .. 0]['000000000001612F3030303030303030' seq:0, type:1 .. '000000000001D6DF3030303030303030' seq:0, type:1](123904)
+ 19:8546011[0 .. 0]['000000000001D6E03030303030303030' seq:0, type:1 .. '0000000000024C9E3030303030303030' seq:0, type:1](126976)
+ 20:8542118[0 .. 0]['0000000000024C9F3030303030303030' seq:0, type:1 .. '000000000002C24F3030303030303030' seq:0, type:1](116736)
+ 21:8546009[0 .. 0]['000000000002C2503030303030303030' seq:0, type:1 .. '000000000003380E3030303030303030' seq:0, type:1](125952)
+ 22:8542117[0 .. 0]['000000000003380F3030303030303030' seq:0, type:1 .. '000000000003ADBF3030303030303030' seq:0, type:1](142336)
+ 23:8546009[0 .. 0]['000000000003ADC03030303030303030' seq:0, type:1 .. '000000000004237E3030303030303030' seq:0, type:1](125952)
+ 24:8542118[0 .. 0]['000000000004237F3030303030303030' seq:0, type:1 .. '000000000004992F3030303030303030' seq:0, type:1](104448)
+ 25:8546008[0 .. 0]['00000000000499303030303030303030' seq:0, type:1 .. '0000000000050EEE3030303030303030' seq:0, type:1](111616)
+ 26:8542118[0 .. 0]['0000000000050EEF3030303030303030' seq:0, type:1 .. '000000000005849F3030303030303030' seq:0, type:1](110592)
+ 27:8546010[0 .. 0]['00000000000584A03030303030303030' seq:0, type:1 .. '000000000005FA5E3030303030303030' seq:0, type:1](129024)
+ 28:8542119[0 .. 0]['000000000005FA5F3030303030303030' seq:0, type:1 .. '000000000006700F3030303030303030' seq:0, type:1](120832)
+ 29:8546009[0 .. 0]['00000000000670103030303030303030' seq:0, type:1 .. '000000000006E5CE3030303030303030' seq:0, type:1](128000)
+ 30:8542119[0 .. 0]['000000000006E5CF3030303030303030' seq:0, type:1 .. '0000000000075B7F3030303030303030' seq:0, type:1](116736)
+ 31:8546010[0 .. 0]['0000000000075B803030303030303030' seq:0, type:1 .. '000000000007D13E3030303030303030' seq:0, type:1](122880)
+ 32:8542118[0 .. 0]['000000000007D13F3030303030303030' seq:0, type:1 .. '00000000000846EF3030303030303030' seq:0, type:1](104448)
+ 33:8546010[0 .. 0]['00000000000846F03030303030303030' seq:0, type:1 .. '000000000008BCAE3030303030303030' seq:0, type:1](108544)
+ 34:8542119[0 .. 0]['000000000008BCAF3030303030303030' seq:0, type:1 .. '000000000009325F3030303030303030' seq:0, type:1](116736)
+ 35:8546010[0 .. 0]['00000000000932603030303030303030' seq:0, type:1 .. '000000000009A81E3030303030303030' seq:0, type:1](117760)
+ 36:8542118[0 .. 0]['000000000009A81F3030303030303030' seq:0, type:1 .. '00000000000A1DCF3030303030303030' seq:0, type:1](132096)
+ 37:8546010[0 .. 0]['00000000000A1DD03030303030303030' seq:0, type:1 .. '00000000000A938E3030303030303030' seq:0, type:1](138240)
+ 38:8542119[0 .. 0]['00000000000A938F3030303030303030' seq:0, type:1 .. '00000000000B093F3030303030303030' seq:0, type:1](134144)
+ 39:8546009[0 .. 0]['00000000000B09403030303030303030' seq:0, type:1 .. '00000000000B7EFE3030303030303030' seq:0, type:1](128000)
+ 40:8542118[0 .. 0]['00000000000B7EFF3030303030303030' seq:0, type:1 .. '00000000000BF4AF3030303030303030' seq:0, type:1](123904)
+ 41:8546011[0 .. 0]['00000000000BF4B03030303030303030' seq:0, type:1 .. '00000000000C6A6E3030303030303030' seq:0, type:1](117760)
+ 42:8542118[0 .. 0]['00000000000C6A6F3030303030303030' seq:0, type:1 .. '00000000000CE01F3030303030303030' seq:0, type:1](123904)
+ 52:8546010[0 .. 0]['00000000000CE0203030303030303030' seq:0, type:1 .. '00000000000D55DE3030303030303030' seq:0, type:1](140288)
+ 53:8542118[0 .. 0]['00000000000D55DF3030303030303030' seq:0, type:1 .. '00000000000DCB8F3030303030303030' seq:0, type:1](105472)
+ 54:8546011[0 .. 0]['00000000000DCB903030303030303030' seq:0, type:1 .. '00000000000E414E3030303030303030' seq:0, type:1](117760)
+ 55:8542117[0 .. 0]['00000000000E414F3030303030303030' seq:0, type:1 .. '00000000000EB6FF3030303030303030' seq:0, type:1](119808)
+ 56:8546012[0 .. 0]['00000000000EB7003030303030303030' seq:0, type:1 .. '00000000000F2CBE3030303030303030' seq:0, type:1](123904)
+ 57:8542118[0 .. 0]['00000000000F2CBF3030303030303030' seq:0, type:1 .. '00000000000FA26F3030303030303030' seq:0, type:1](116736)
+ 58:8546013[0 .. 0]['00000000000FA2703030303030303030' seq:0, type:1 .. '000000000010182E3030303030303030' seq:0, type:1](136192)
+ 59:8542117[0 .. 0]['000000000010182F3030303030303030' seq:0, type:1 .. '0000000000108DDF3030303030303030' seq:0, type:1](115712)
+ 60:8546013[0 .. 0]['0000000000108DE03030303030303030' seq:0, type:1 .. '000000000011039E3030303030303030' seq:0, type:1](142336)
+ 61:8542118[0 .. 0]['000000000011039F3030303030303030' seq:0, type:1 .. '000000000011794F3030303030303030' seq:0, type:1](123904)
+ 62:8546010[0 .. 0]['00000000001179503030303030303030' seq:0, type:1 .. '000000000011EF0E3030303030303030' seq:0, type:1](119808)
+ 63:8542118[0 .. 0]['000000000011EF0F3030303030303030' seq:0, type:1 .. '00000000001264BF3030303030303030' seq:0, type:1](109568)
+ 64:8546010[0 .. 0]['00000000001264C03030303030303030' seq:0, type:1 .. '000000000012DA7E3030303030303030' seq:0, type:1](131072)
+ 65:8542119[0 .. 0]['000000000012DA7F3030303030303030' seq:0, type:1 .. '000000000013502F3030303030303030' seq:0, type:1](133120)
+ 66:8546009[0 .. 0]['00000000001350303030303030303030' seq:0, type:1 .. '000000000013C5EE3030303030303030' seq:0, type:1](118784)
+ 67:8542119[0 .. 0]['000000000013C5EF3030303030303030' seq:0, type:1 .. '0000000000143B9F3030303030303030' seq:0, type:1](131072)
+ 68:8546010[0 .. 0]['0000000000143BA03030303030303030' seq:0, type:1 .. '000000000014B15E3030303030303030' seq:0, type:1](108544)
+ 69:8542119[0 .. 0]['000000000014B15F3030303030303030' seq:0, type:1 .. '000000000015270F3030303030303030' seq:0, type:1](115712)
+ 70:8546009[0 .. 0]['00000000001527103030303030303030' seq:0, type:1 .. '0000000000159CCE3030303030303030' seq:0, type:1](124928)
+ 71:8542119[0 .. 0]['0000000000159CCF3030303030303030' seq:0, type:1 .. '000000000016127F3030303030303030' seq:0, type:1](115712)
+ 72:8546010[0 .. 0]['00000000001612803030303030303030' seq:0, type:1 .. '000000000016883E3030303030303030' seq:0, type:1](117760)
+ 73:8542117[0 .. 0]['000000000016883F3030303030303030' seq:0, type:1 .. '000000000016FDEF3030303030303030' seq:0, type:1](121856)
+ 74:8546011[0 .. 0]['000000000016FDF03030303030303030' seq:0, type:1 .. '00000000001773AE3030303030303030' seq:0, type:1](130048)
+ 75:8542118[0 .. 0]['00000000001773AF3030303030303030' seq:0, type:1 .. '000000000017E95F3030303030303030' seq:0, type:1](124928)
+ 76:8546011[0 .. 0]['000000000017E9603030303030303030' seq:0, type:1 .. '0000000000185F1E3030303030303030' seq:0, type:1](118784)
+ 77:8542117[0 .. 0]['0000000000185F1F3030303030303030' seq:0, type:1 .. '000000000018D4CF3030303030303030' seq:0, type:1](121856)
+ 78:8546011[0 .. 0]['000000000018D4D03030303030303030' seq:0, type:1 .. '0000000000194A8E3030303030303030' seq:0, type:1](116736)
+ 79:8542118[0 .. 0]['0000000000194A8F3030303030303030' seq:0, type:1 .. '000000000019C03F3030303030303030' seq:0, type:1](97280)
+ 89:8546010[0 .. 0]['000000000019C0403030303030303030' seq:0, type:1 .. '00000000001A35FE3030303030303030' seq:0, type:1](118784)
+ 90:8542118[0 .. 0]['00000000001A35FF3030303030303030' seq:0, type:1 .. '00000000001AABAF3030303030303030' seq:0, type:1](116736)
+ 91:8546011[0 .. 0]['00000000001AABB03030303030303030' seq:0, type:1 .. '00000000001B216E3030303030303030' seq:0, type:1](113664)
+ 92:8542118[0 .. 0]['00000000001B216F3030303030303030' seq:0, type:1 .. '00000000001B971F3030303030303030' seq:0, type:1](132096)
+ 93:8546010[0 .. 0]['00000000001B97203030303030303030' seq:0, type:1 .. '00000000001C0CDE3030303030303030' seq:0, type:1](119808)
+ 94:8542118[0 .. 0]['00000000001C0CDF3030303030303030' seq:0, type:1 .. '00000000001C828F3030303030303030' seq:0, type:1](111616)
+ 95:8546010[0 .. 0]['00000000001C82903030303030303030' seq:0, type:1 .. '00000000001CF84E3030303030303030' seq:0, type:1](143360)
+ 96:8542118[0 .. 0]['00000000001CF84F3030303030303030' seq:0, type:1 .. '00000000001D6DFF3030303030303030' seq:0, type:1](135168)
+ 97:8546011[0 .. 0]['00000000001D6E003030303030303030' seq:0, type:1 .. '00000000001DE3BE3030303030303030' seq:0, type:1](119808)
+ 98:8542119[0 .. 0]['00000000001DE3BF3030303030303030' seq:0, type:1 .. '00000000001E596F3030303030303030' seq:0, type:1](125952)
+ 99:8546012[0 .. 0]['00000000001E59703030303030303030' seq:0, type:1 .. '00000000001ECF2E3030303030303030' seq:0, type:1](40960)
+ 100:8542118[0 .. 0]['00000000001ECF2F3030303030303030' seq:0, type:1 .. '00000000001F44DF3030303030303030' seq:0, type:1](0)
+ 101:8546012[0 .. 0]['00000000001F44E03030303030303030' seq:0, type:1 .. '00000000001FBA9E3030303030303030' seq:0, type:1](0)
+ 102:8542119[0 .. 0]['00000000001FBA9F3030303030303030' seq:0, type:1 .. '000000000020304F3030303030303030' seq:0, type:1](0)
+ 103:8546010[0 .. 0]['00000000002030503030303030303030' seq:0, type:1 .. '000000000020A60E3030303030303030' seq:0, type:1](0)
+ 104:8542118[0 .. 0]['000000000020A60F3030303030303030' seq:0, type:1 .. '0000000000211BBF3030303030303030' seq:0, type:1](0)
+ 105:8546010[0 .. 0]['0000000000211BC03030303030303030' seq:0, type:1 .. '000000000021917E3030303030303030' seq:0, type:1](0)
+ 106:8542119[0 .. 0]['000000000021917F3030303030303030' seq:0, type:1 .. '000000000022072F3030303030303030' seq:0, type:1](0)
+ 107:8546009[0 .. 0]['00000000002207303030303030303030' seq:0, type:1 .. '0000000000227CEE3030303030303030' seq:0, type:1](0)
+ 108:8542118[0 .. 0]['0000000000227CEF3030303030303030' seq:0, type:1 .. '000000000022F29F3030303030303030' seq:0, type:1](0)
+ 109:8546011[0 .. 0]['000000000022F2A03030303030303030' seq:0, type:1 .. '000000000023685E3030303030303030' seq:0, type:1](0)
+ 110:8542118[0 .. 0]['000000000023685F3030303030303030' seq:0, type:1 .. '000000000023DE0F3030303030303030' seq:0, type:1](0)
+ 111:8546010[0 .. 0]['000000000023DE103030303030303030' seq:0, type:1 .. '00000000002453CE3030303030303030' seq:0, type:1](0)
+ 112:8542118[0 .. 0]['00000000002453CF3030303030303030' seq:0, type:1 .. '000000000024C97F3030303030303030' seq:0, type:1](0)
+ 113:8546011[0 .. 0]['000000000024C9803030303030303030' seq:0, type:1 .. '0000000000253F3E3030303030303030' seq:0, type:1](0)
+ 114:8542117[0 .. 0]['0000000000253F3F3030303030303030' seq:0, type:1 .. '000000000025B4EF3030303030303030' seq:0, type:1](0)
+ 115:8546011[0 .. 0]['000000000025B4F03030303030303030' seq:0, type:1 .. '0000000000262AAE3030303030303030' seq:0, type:1](0)
+ 116:8542118[0 .. 0]['0000000000262AAF3030303030303030' seq:0, type:1 .. '000000000026A05F3030303030303030' seq:0, type:1](0)
+ 117:8546011[0 .. 0]['000000000026A0603030303030303030' seq:0, type:1 .. '000000000027161E3030303030303030' seq:0, type:1](0)
+ 118:2960512[0 .. 0]['000000000027161F3030303030303030' seq:0, type:1 .. '0000000000273EE73030303030303030' seq:0, type:1](0)
+ 176:8542119[0 .. 0]['0000000000399ED53030303030303030' seq:0, type:1 .. '00000000003A14853030303030303030' seq:0, type:1](0)
+ 177:8546010[0 .. 0]['00000000003A14863030303030303030' seq:0, type:1 .. '00000000003A8A443030303030303030' seq:0, type:1](0)
+ 178:8542117[0 .. 0]['00000000003A8A453030303030303030' seq:0, type:1 .. '00000000003AFFF53030303030303030' seq:0, type:1](0)
+ 179:8546011[0 .. 0]['00000000003AFFF63030303030303030' seq:0, type:1 .. '00000000003B75B43030303030303030' seq:0, type:1](0)
+ 180:8542118[0 .. 0]['00000000003B75B53030303030303030' seq:0, type:1 .. '00000000003BEB653030303030303030' seq:0, type:1](0)
+ 181:8546011[0 .. 0]['00000000003BEB663030303030303030' seq:0, type:1 .. '00000000003C61243030303030303030' seq:0, type:1](0)
+ 182:8542117[0 .. 0]['00000000003C61253030303030303030' seq:0, type:1 .. '00000000003CD6D53030303030303030' seq:0, type:1](0)
+ 183:8546011[0 .. 0]['00000000003CD6D63030303030303030' seq:0, type:1 .. '00000000003D4C943030303030303030' seq:0, type:1](0)
+ 184:8542118[0 .. 0]['00000000003D4C953030303030303030' seq:0, type:1 .. '00000000003DC2453030303030303030' seq:0, type:1](0)
+ 185:8546013[0 .. 0]['00000000003DC2463030303030303030' seq:0, type:1 .. '00000000003E38043030303030303030' seq:0, type:1](0)
+ 186:8542117[0 .. 0]['00000000003E38053030303030303030' seq:0, type:1 .. '00000000003EADB53030303030303030' seq:0, type:1](0)
+ 187:8546013[0 .. 0]['00000000003EADB63030303030303030' seq:0, type:1 .. '00000000003F23743030303030303030' seq:0, type:1](0)
+ 188:8542118[0 .. 0]['00000000003F23753030303030303030' seq:0, type:1 .. '00000000003F99253030303030303030' seq:0, type:1](0)
+ 189:8546012[0 .. 0]['00000000003F99263030303030303030' seq:0, type:1 .. '0000000000400EE43030303030303030' seq:0, type:1](0)
+ 190:8542118[0 .. 0]['0000000000400EE53030303030303030' seq:0, type:1 .. '00000000004084953030303030303030' seq:0, type:1](0)
+ 191:8546010[0 .. 0]['00000000004084963030303030303030' seq:0, type:1 .. '000000000040FA543030303030303030' seq:0, type:1](0)
+ 205:8542119[0 .. 0]['000000000040FA553030303030303030' seq:0, type:1 .. '00000000004170053030303030303030' seq:0, type:1](0)
+ 214:8546010[0 .. 0]['0000000000451DC63030303030303030' seq:0, type:1 .. '00000000004593843030303030303030' seq:0, type:1](0)
+
+STATISTICS:
+rocksdb.block.cache.miss COUNT : 0
+rocksdb.block.cache.hit COUNT : 0
+rocksdb.block.cache.add COUNT : 0
+rocksdb.block.cache.add.failures COUNT : 0
+rocksdb.block.cache.index.miss COUNT : 0
+rocksdb.block.cache.index.hit COUNT : 0
+rocksdb.block.cache.index.add COUNT : 0
+rocksdb.block.cache.index.bytes.insert COUNT : 0
+rocksdb.block.cache.index.bytes.evict COUNT : 0
+rocksdb.block.cache.filter.miss COUNT : 0
+rocksdb.block.cache.filter.hit COUNT : 0
+rocksdb.block.cache.filter.add COUNT : 0
+rocksdb.block.cache.filter.bytes.insert COUNT : 0
+rocksdb.block.cache.filter.bytes.evict COUNT : 0
+rocksdb.block.cache.data.miss COUNT : 0
+rocksdb.block.cache.data.hit COUNT : 0
+rocksdb.block.cache.data.add COUNT : 0
+rocksdb.block.cache.data.bytes.insert COUNT : 0
+rocksdb.block.cache.bytes.read COUNT : 0
+rocksdb.block.cache.bytes.write COUNT : 0
+rocksdb.bloom.filter.useful COUNT : 0
+rocksdb.bloom.filter.full.positive COUNT : 8000000
+rocksdb.bloom.filter.full.true.positive COUNT : 8000000
+rocksdb.bloom.filter.micros COUNT : 0
+rocksdb.persistent.cache.hit COUNT : 7857079
+rocksdb.persistent.cache.miss COUNT : 143422
+rocksdb.sim.block.cache.hit COUNT : 0
+rocksdb.sim.block.cache.miss COUNT : 0
+rocksdb.memtable.hit COUNT : 0
+rocksdb.memtable.miss COUNT : 8000000
+rocksdb.l0.hit COUNT : 0
+rocksdb.l1.hit COUNT : 0
+rocksdb.l2andup.hit COUNT : 8000000
+rocksdb.compaction.key.drop.new COUNT : 0
+rocksdb.compaction.key.drop.obsolete COUNT : 0
+rocksdb.compaction.key.drop.range_del COUNT : 0
+rocksdb.compaction.key.drop.user COUNT : 0
+rocksdb.compaction.range_del.drop.obsolete COUNT : 0
+rocksdb.compaction.optimized.del.drop.obsolete COUNT : 0
+rocksdb.compaction.cancelled COUNT : 0
+rocksdb.number.keys.written COUNT : 0
+rocksdb.number.keys.read COUNT : 8000000
+rocksdb.number.keys.updated COUNT : 0
+rocksdb.bytes.written COUNT : 0
+rocksdb.bytes.read COUNT : 2048000000
+rocksdb.number.db.seek COUNT : 0
+rocksdb.number.db.next COUNT : 0
+rocksdb.number.db.prev COUNT : 0
+rocksdb.number.db.seek.found COUNT : 0
+rocksdb.number.db.next.found COUNT : 0
+rocksdb.number.db.prev.found COUNT : 0
+rocksdb.db.iter.bytes.read COUNT : 0
+rocksdb.no.file.closes COUNT : 0
+rocksdb.no.file.opens COUNT : 167
+rocksdb.no.file.errors COUNT : 0
+rocksdb.l0.slowdown.micros COUNT : 0
+rocksdb.memtable.compaction.micros COUNT : 0
+rocksdb.l0.num.files.stall.micros COUNT : 0
+rocksdb.stall.micros COUNT : 0
+rocksdb.db.mutex.wait.micros COUNT : 0
+rocksdb.rate.limit.delay.millis COUNT : 0
+rocksdb.num.iterators COUNT : 0
+rocksdb.number.multiget.get COUNT : 0
+rocksdb.number.multiget.keys.read COUNT : 0
+rocksdb.number.multiget.bytes.read COUNT : 0
+rocksdb.number.deletes.filtered COUNT : 0
+rocksdb.number.merge.failures COUNT : 0
+rocksdb.bloom.filter.prefix.checked COUNT : 0
+rocksdb.bloom.filter.prefix.useful COUNT : 0
+rocksdb.number.reseeks.iteration COUNT : 0
+rocksdb.getupdatessince.calls COUNT : 0
+rocksdb.block.cachecompressed.miss COUNT : 0
+rocksdb.block.cachecompressed.hit COUNT : 0
+rocksdb.block.cachecompressed.add COUNT : 0
+rocksdb.block.cachecompressed.add.failures COUNT : 0
+rocksdb.wal.synced COUNT : 0
+rocksdb.wal.bytes COUNT : 0
+rocksdb.write.self COUNT : 0
+rocksdb.write.other COUNT : 0
+rocksdb.write.timeout COUNT : 0
+rocksdb.write.wal COUNT : 0
+rocksdb.compact.read.bytes COUNT : 0
+rocksdb.compact.write.bytes COUNT : 0
+rocksdb.flush.write.bytes COUNT : 0
+rocksdb.number.direct.load.table.properties COUNT : 0
+rocksdb.number.superversion_acquires COUNT : 4
+rocksdb.number.superversion_releases COUNT : 0
+rocksdb.number.superversion_cleanups COUNT : 0
+rocksdb.number.block.compressed COUNT : 0
+rocksdb.number.block.decompressed COUNT : 0
+rocksdb.number.block.not_compressed COUNT : 0
+rocksdb.merge.operation.time.nanos COUNT : 0
+rocksdb.filter.operation.time.nanos COUNT : 0
+rocksdb.row.cache.hit COUNT : 0
+rocksdb.row.cache.miss COUNT : 0
+rocksdb.read.amp.estimate.useful.bytes COUNT : 0
+rocksdb.read.amp.total.read.bytes COUNT : 0
+rocksdb.number.rate_limiter.drains COUNT : 0
+rocksdb.number.iter.skip COUNT : 0
+rocksdb.blobdb.num.put COUNT : 0
+rocksdb.blobdb.num.write COUNT : 0
+rocksdb.blobdb.num.get COUNT : 0
+rocksdb.blobdb.num.multiget COUNT : 0
+rocksdb.blobdb.num.seek COUNT : 0
+rocksdb.blobdb.num.next COUNT : 0
+rocksdb.blobdb.num.prev COUNT : 0
+rocksdb.blobdb.num.keys.written COUNT : 0
+rocksdb.blobdb.num.keys.read COUNT : 0
+rocksdb.blobdb.bytes.written COUNT : 0
+rocksdb.blobdb.bytes.read COUNT : 0
+rocksdb.blobdb.write.inlined COUNT : 0
+rocksdb.blobdb.write.inlined.ttl COUNT : 0
+rocksdb.blobdb.write.blob COUNT : 0
+rocksdb.blobdb.write.blob.ttl COUNT : 0
+rocksdb.blobdb.blob.file.bytes.written COUNT : 0
+rocksdb.blobdb.blob.file.bytes.read COUNT : 0
+rocksdb.blobdb.blob.file.synced COUNT : 0
+rocksdb.blobdb.blob.index.expired.count COUNT : 0
+rocksdb.blobdb.blob.index.expired.size COUNT : 0
+rocksdb.blobdb.blob.index.evicted.count COUNT : 0
+rocksdb.blobdb.blob.index.evicted.size COUNT : 0
+rocksdb.blobdb.gc.num.files COUNT : 0
+rocksdb.blobdb.gc.num.new.files COUNT : 0
+rocksdb.blobdb.gc.failures COUNT : 0
+rocksdb.blobdb.gc.num.keys.overwritten COUNT : 0
+rocksdb.blobdb.gc.num.keys.expired COUNT : 0
+rocksdb.blobdb.gc.num.keys.relocated COUNT : 0
+rocksdb.blobdb.gc.bytes.overwritten COUNT : 0
+rocksdb.blobdb.gc.bytes.expired COUNT : 0
+rocksdb.blobdb.gc.bytes.relocated COUNT : 0
+rocksdb.blobdb.fifo.num.files.evicted COUNT : 0
+rocksdb.blobdb.fifo.num.keys.evicted COUNT : 0
+rocksdb.blobdb.fifo.bytes.evicted COUNT : 0
+rocksdb.txn.overhead.mutex.prepare COUNT : 0
+rocksdb.txn.overhead.mutex.old.commit.map COUNT : 0
+rocksdb.txn.overhead.duplicate.key COUNT : 0
+rocksdb.txn.overhead.mutex.snapshot COUNT : 0
+rocksdb.number.multiget.keys.found COUNT : 0
+rocksdb.num.iterator.created COUNT : 0
+rocksdb.num.iterator.deleted COUNT : 0
+rocksdb.block.cache.compression.dict.miss COUNT : 0
+rocksdb.block.cache.compression.dict.hit COUNT : 0
+rocksdb.block.cache.compression.dict.add COUNT : 0
+rocksdb.block.cache.compression.dict.bytes.insert COUNT : 0
+rocksdb.block.cache.compression.dict.bytes.evict COUNT : 0
+rocksdb.db.get.micros P50 : 28.192764 P95 : 46.511793 P99 : 68.650659 P100 : 4663.000000 COUNT : 8000000 SUM : 226151322
+rocksdb.db.write.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.compaction.times.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.compaction.times.cpu_micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.subcompaction.setup.times.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.table.sync.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.compaction.outfile.sync.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.wal.file.sync.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.manifest.file.sync.micros P50 : 221.000000 P95 : 221.000000 P99 : 221.000000 P100 : 221.000000 COUNT : 1 SUM : 221
+rocksdb.table.open.io.micros P50 : 1151.824324 P95 : 2257.692308 P99 : 2714.000000 P100 : 2714.000000 COUNT : 167 SUM : 199787
+rocksdb.db.multiget.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.read.block.compaction.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.read.block.get.micros P50 : 22.398520 P95 : 33.882433 P99 : 56.499644 P100 : 3787.000000 COUNT : 8000334 SUM : 179429691
+rocksdb.write.raw.block.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.l0.slowdown.count P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.memtable.compaction.count P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.num.files.stall.count P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.hard.rate.limit.delay.count P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.soft.rate.limit.delay.count P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.numfiles.in.singlecompaction P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.db.seek.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.db.write.stall P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.sst.read.micros P50 : 17.846178 P95 : 33.552701 P99 : 48.656638 P100 : 933.000000 COUNT : 143756 SUM : 2507389
+rocksdb.num.subcompactions.scheduled P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.bytes.per.read P50 : 256.000000 P95 : 256.000000 P99 : 256.000000 P100 : 256.000000 COUNT : 8000000 SUM : 2048000000
+rocksdb.bytes.per.write P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.bytes.per.multiget P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.bytes.compressed P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.bytes.decompressed P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.compression.times.nanos P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.decompression.times.nanos P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.read.num.merge_operands P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.blobdb.key.size P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.blobdb.value.size P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.blobdb.write.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.blobdb.get.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.blobdb.multiget.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.blobdb.seek.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.blobdb.next.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.blobdb.prev.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.blobdb.blob.file.write.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.blobdb.blob.file.read.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.blobdb.blob.file.sync.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.blobdb.gc.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.blobdb.compression.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.blobdb.decompression.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.db.flush.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+rocksdb.sst.batch.size P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0
+
