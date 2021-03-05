@@ -2,7 +2,7 @@ make_config.mk
 
 pcache_file
 
-
+*.log
 
 *.a
 *.arc
