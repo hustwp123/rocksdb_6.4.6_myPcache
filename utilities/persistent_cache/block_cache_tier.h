@@ -20,6 +20,8 @@
 #include <thread>
 #include <unordered_map>
 #include <vector>
+#include <unistd.h>
+#include <fcntl.h>
 
 #include "memory/arena.h"
 #include "memtable/skiplist.h"
@@ -175,8 +177,8 @@ class SST_space  // cache 管理单个SST所占空间
 {
  public:
   SST_space(){};
-  void Set_Par(FILE* fp_, uint32_t num, uint32_t begin_) {
-    fp = fp_;
+  void Set_Par(int fd_, uint32_t num, uint32_t begin_) {
+    fd = fd_;
     begin = begin_;
     all_num = num;
     empty_num = num;
@@ -187,8 +189,8 @@ class SST_space  // cache 管理单个SST所占空间
     head->next = tail;
     tail->prev = head;
   }
-  SST_space(FILE* fp_, int num, int begin_)
-      : fp(fp_), begin(begin_), all_num(num), empty_num(num) {
+  SST_space(int fd_, int num, int begin_)
+      : fd(fd_), begin(begin_), all_num(num), empty_num(num) {
     bit_map.resize(num);
     bit_map.assign(num, 0);
     head = new DLinkedNode();
@@ -242,7 +244,7 @@ class SST_space  // cache 管理单个SST所占空间
   }
 
  private:
-  FILE* fp = nullptr;
+  int fd=-1;
   uint32_t begin;             //指向该SST空间起始位置
   std::vector<bool> bit_map;  // bitmap暂时用bool数组代替
   uint32_t all_num;           //总空间数
@@ -328,9 +330,9 @@ class myCache : public PersistentCacheTier {
  private:
   BoundedQueue<myInsertOp> insert_ops_;  // Ops waiting for insert
   rocksdb::port::Thread insert_th_;      // Insert thread
-  port::RWMutex lock_;                   // Synchronization
+  port::Mutex lock_;                   // Synchronization
 
-  FILE* fp = NULL;
+  int fd=-1;
   int NUM;
 
   const PersistentCacheConfig opt_;  // BlockCache options

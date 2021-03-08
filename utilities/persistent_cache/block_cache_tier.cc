@@ -433,10 +433,13 @@ Status SST_space::Get(const std::string key, std::unique_ptr<char[]>* data,
   *size = node->value.size;
   size_t cur = 0;
   for (uint32_t i = 0; i < (node->value.offset.size() - 1); i++) {
-    fseek(fp, begin + node->value.offset[i], SEEK_SET);
-    size_t t = fread(data->get() + cur, SPACE_SIZE, 1, fp);
-    if (t != 1 && t != 0) {
-      printf("t==%lu\n", t);
+    // fseek(fp, begin + node->value.offset[i], SEEK_SET);
+    // size_t t = fread(data->get() + cur, SPACE_SIZE, 1, fp);
+
+    ssize_t t =
+        pread(fd, data->get() + cur, SPACE_SIZE, begin + node->value.offset[i]);
+    if (t < 0) {
+      return Status::IOError();
     }
     cur += SPACE_SIZE;
   }
@@ -446,10 +449,15 @@ Status SST_space::Get(const std::string key, std::unique_ptr<char[]>* data,
                       : node->value.size % SPACE_SIZE;
   // printf("left_size=%d\n",left_size);
   int index = node->value.offset.size() - 1;
-  fseek(fp, begin + node->value.offset[index], SEEK_SET);
-  size_t t = fread(data->get() + cur, left_size, 1, fp);
-  if (t != 1 && t != 0) {
-    printf("t==%lu\n", t);
+  // fseek(fp, begin + node->value.offset[index], SEEK_SET);
+  // size_t t = fread(data->get() + cur, left_size, 1, fp);
+  // if (t != 1 && t != 0) {
+  //   printf("t==%lu\n", t);
+  // }
+  ssize_t t = pread(fd, data->get() + cur, left_size,
+                    begin + node->value.offset[index]);
+  if (t < 0) {
+    return Status::IOError();
   }
   // printf("get key size=%ld value size=%ld
   // node.size=%ld\n",key.size(),re.size(),node->value.size); printf("val==:
@@ -465,10 +473,14 @@ std::string SST_space::Get(std::string key) {
   char* s = new char[node->value.size + 1];
   size_t cur = 0;
   for (uint32_t i = 0; i < (node->value.offset.size() - 1); i++) {
-    fseek(fp, begin + node->value.offset[i], SEEK_SET);
-    size_t t = fread(s + cur, SPACE_SIZE, 1, fp);
-    if (t != 1 && t != 0) {
-      printf("t==%lu\n", t);
+    // fseek(fp, begin + node->value.offset[i], SEEK_SET);
+    // size_t t = fread(s + cur, SPACE_SIZE, 1, fp);
+    // if (t != 1 && t != 0) {
+    //   printf("t==%lu\n", t);
+    // }
+    ssize_t t = pread(fd, s + cur, SPACE_SIZE, begin + node->value.offset[i]);
+    if (t < 0) {
+      return "";
     }
 
     cur += SPACE_SIZE;
@@ -479,10 +491,14 @@ std::string SST_space::Get(std::string key) {
                       : node->value.size % SPACE_SIZE;
   // printf("left_size=%d\n",left_size);
   int index = node->value.offset.size() - 1;
-  fseek(fp, begin + node->value.offset[index], SEEK_SET);
-  size_t t = fread(s + cur, left_size, 1, fp);
-  if (t != 1 && t != 0) {
-    printf("t==%lu\n", t);
+  // fseek(fp, begin + node->value.offset[index], SEEK_SET);
+  // size_t t = fread(s + cur, left_size, 1, fp);
+  // if (t != 1 && t != 0) {
+  //   printf("t==%lu\n", t);
+  // }
+  ssize_t t = pread(fd, s + cur, left_size, begin + node->value.offset[index]);
+  if (t < 0) {
+    return "";
   }
   s[node->value.size] = '\0';
   std::string re = std::string(s, node->value.size);
@@ -502,7 +518,7 @@ Status SST_space::Put(const std::string key, const char* data,
   uint32_t need_num = size / SPACE_SIZE;
   need_num += size % SPACE_SIZE == 0 ? 0 : 1;
   if (need_num > all_num) {
-   // printf("too large size=%ld\n", size);
+    // printf("too large size=%ld\n", size);
     return Status::OK();
   }
   DLinkedNode* node;
@@ -549,8 +565,14 @@ Status SST_space::Put(const std::string key, const char* data,
   //写块
   size_t cur = 0;
   for (uint32_t i = 0; i < node->value.offset.size() - 1; i++) {
-    fseek(fp, begin + node->value.offset[i], SEEK_SET);
-    fwrite(data + cur, SPACE_SIZE, 1, fp);
+    // fseek(fp, begin + node->value.offset[i], SEEK_SET);
+    // fwrite(data + cur, SPACE_SIZE, 1, fp);
+
+    ssize_t t =
+        pwrite(fd, data + cur, SPACE_SIZE, begin + node->value.offset[i]);
+    if (t < 0) {
+      return Status::IOError();
+    }
     cur += SPACE_SIZE;
   }
   // fprintf(stderr,"test3.1\n");
@@ -558,10 +580,17 @@ Status SST_space::Put(const std::string key, const char* data,
   size_t left_size = size % SPACE_SIZE == 0 ? SPACE_SIZE : size % SPACE_SIZE;
   // fprintf(stderr,"test3.2\n");
   int index = node->value.offset.size() - 1;
-  fseek(fp, begin + node->value.offset[index], SEEK_SET);
-  // fprintf(stderr,"test3.3  left_size=%ld cur=%ld
-  // size=%ld\n",left_size,cur,size);
-  fwrite(data + cur, left_size, 1, fp);
+  // fseek(fp, begin + node->value.offset[index], SEEK_SET);
+  // // fprintf(stderr,"test3.3  left_size=%ld cur=%ld
+  // // size=%ld\n",left_size,cur,size);
+  // fwrite(data + cur, left_size, 1, fp);
+
+  ssize_t t =
+      pwrite(fd, data + cur, left_size, begin + node->value.offset[index]);
+  if (t < 0) {
+    return Status::IOError();
+  }
+
   // fprintf(stderr,"test4\n");
   empty_num -= need_num;
   return Status::OK();
@@ -575,7 +604,7 @@ void SST_space::Put(const std::string& key, const std::string& value) {
   uint32_t need_num = value.size() / SPACE_SIZE;
   need_num += value.size() % SPACE_SIZE == 0 ? 0 : 1;
   if (need_num > all_num) {
-    //printf("too large size=%ld\n", value.size());
+    // printf("too large size=%ld\n", value.size());
     return;
   }
   DLinkedNode* node;
@@ -620,35 +649,46 @@ void SST_space::Put(const std::string& key, const std::string& value) {
   //写块
   size_t cur = 0;
   for (uint32_t i = 0; i < node->value.offset.size() - 1; i++) {
-    fseek(fp, begin + node->value.offset[i], SEEK_SET);
-    fwrite(value.c_str() + cur, SPACE_SIZE, 1, fp);
+    // fseek(fp, begin + node->value.offset[i], SEEK_SET);
+    // fwrite(value.c_str() + cur, SPACE_SIZE, 1, fp);
+
+    ssize_t t = pwrite(fd, value.c_str() + cur, SPACE_SIZE,
+                       begin + node->value.offset[i]);
+    if (t < 0) {
+      return;
+    }
     cur += SPACE_SIZE;
   }
   node->value.size = value.size();
   size_t left_size =
       value.size() % SPACE_SIZE == 0 ? SPACE_SIZE : value.size() % SPACE_SIZE;
   int index = node->value.offset.size() - 1;
-  fseek(fp, begin + node->value.offset[index], SEEK_SET);
-  fwrite(value.c_str() + cur, left_size, 1, fp);
+  // fseek(fp, begin + node->value.offset[index], SEEK_SET);
+  // fwrite(value.c_str() + cur, left_size, 1, fp);
 
+  ssize_t t = pwrite(fd, value.c_str() + cur, left_size,
+                     begin + node->value.offset[index]);
+  if (t < 0) {
+    return;
+  }
   empty_num -= need_num;
 }
-Status myCache::InsertImpl(const Slice& key, const char* data, const size_t size,
-                  std::string fname) {
-  WriteLock _(&lock_);
-   fprintf(stderr,"myCache Insert size=%ld\n",size);
+Status myCache::InsertImpl(const Slice& key, const char* data,
+                           const size_t size, std::string fname) {
+  MutexLock _(&lock_);
+  fprintf(stderr, "myCache Insert size=%ld\n", size);
   std::string skey(key.data(), key.size());
   int index = getIndex(fname);
-  //fprintf(stderr,"index=%d\n NUM=%d",index,NUM);
-  Status s=v[index].Put(skey, data, size);
+  // fprintf(stderr,"index=%d\n NUM=%d",index,NUM);
+  Status s = v[index].Put(skey, data, size);
   return s;
 }
 
 Status myCache::Insert(const Slice& key, const char* data, const size_t size,
                        std::string fname) {
   if (opt_.pipeline_writes) {
-    insert_ops_.Push(myInsertOp(key.ToString(),std::move(std::string(data, size)),
-    std::move(fname)));
+    insert_ops_.Push(myInsertOp(
+        key.ToString(), std::move(std::string(data, size)), std::move(fname)));
     return Status::OK();
   }
   return InsertImpl(key, data, size, fname);
@@ -661,52 +701,59 @@ void myCache::InsertMain() {
       // that is a secret signal to exit
       break;
     }
-    Insert2(op.key_,op.value_,op.fname_);
+    Insert2(op.key_, op.value_, op.fname_);
   }
 }
 
 Status myCache::Lookup(const Slice& key, std::unique_ptr<char[]>* data,
                        size_t* size, std::string fname) {
-  WriteLock _(&lock_);
-   //fprintf(stderr,"Lookup\n");
+  MutexLock _(&lock_);
+  // fprintf(stderr,"Lookup\n");
   std::string skey(key.data(), key.size());
   int index = getIndex(fname);
-  Status s=v[index].Get(skey, data, size);
+  Status s = v[index].Get(skey, data, size);
   return s;
 }
 
-Status myCache::Insert2(const std::string & key, const std::string& value,
-                        std::string &fname) {
-  //fprintf(stderr,"myCache Insert2 size=%ld\n",value.size());        
-  WriteLock _(&lock_);
+Status myCache::Insert2(const std::string& key, const std::string& value,
+                        std::string& fname) {
+  // fprintf(stderr,"myCache Insert2 size=%ld\n",value.size());
+  MutexLock _(&lock_);
   int index = getIndex(fname);
-  //fprintf(stderr,"index=%d\n NUM=%d",index,NUM);
-  v[index].Put(key,value);
+  // fprintf(stderr,"index=%d\n NUM=%d",index,NUM);
+  v[index].Put(key, value);
   return Status::OK();
 }
 
-
 Status myCache::Open() {
-  WriteLock _(&lock_);
+  MutexLock _(&lock_);
   std::string path = opt_.path;
   path += "/pcache_file";
   printf("paht=%s\n", path.c_str());
-  fp = fopen(path.c_str(), "w+");
-  if (fp == NULL) {
-    printf("error open\n");
-    return Status::IOError();
-  }
-  int re = fseek(fp, opt_.cache_size, SEEK_SET);
-  if (re != 0) {
-    printf("error seek\n");
-    return Status::IOError();
-  }
+  fd = open(path.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0777);
+  lseek(fd, opt_.cache_size, SEEK_SET);
   int t = -1;
-  re = fwrite(&t, sizeof(int), 1, fp);
-  if (re <= 0) {
-    printf("error write\n");
+  ssize_t tt = write(fd, &t, sizeof(int));
+  if (tt < 0) {
     return Status::IOError();
   }
+
+  // fp = fopen(path.c_str(), "w+");
+  // if (fp == NULL) {
+  //   printf("error open\n");
+  //   return Status::IOError();
+  // }
+  // int re = fseek(fp, opt_.cache_size, SEEK_SET);
+  // if (re != 0) {
+  //   printf("error seek\n");
+  //   return Status::IOError();
+  // }
+  // int t = -1;
+  // re = fwrite(&t, sizeof(int), 1, fp);
+  // if (re <= 0) {
+  //   printf("error write\n");
+  //   return Status::IOError();
+  // }
   // NUM = 1;
   // v.resize(NUM);
   // for (int i = 0; i < NUM; i++) {
@@ -715,7 +762,7 @@ Status myCache::Open() {
   NUM = opt_.cache_size / SST_SIZE;
   v.resize(NUM);
   for (int i = 0; i < NUM; i++) {
-    v[i].Set_Par(fp, SST_SIZE / SPACE_SIZE, i * SST_SIZE);
+    v[i].Set_Par(fd, SST_SIZE / SPACE_SIZE, i * SST_SIZE);
   }
   if (opt_.pipeline_writes) {
     insert_th_ = port::Thread(&myCache::InsertMain, this);
@@ -723,13 +770,13 @@ Status myCache::Open() {
   return Status::OK();
 }
 Status myCache::Close() {
-  WriteLock _(&lock_);
+  MutexLock _(&lock_);
   if (opt_.pipeline_writes && insert_th_.joinable()) {
     myInsertOp op(/*quit=*/true);
     insert_ops_.Push(std::move(op));
     insert_th_.join();
   }
-  fclose(fp);
+  close(fd);
   return Status::OK();
 }
 bool myCache::Erase(const Slice& key) {
