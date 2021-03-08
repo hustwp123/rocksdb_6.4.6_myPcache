@@ -135,7 +135,7 @@ Status ReadBlockFromFile(
     const UncompressionDict& uncompression_dict,
     const PersistentCacheOptions& cache_options, SequenceNumber global_seqno,
     size_t read_amp_bytes_per_bit, MemoryAllocator* memory_allocator,
-    bool for_compaction, bool using_zstd) {
+    bool for_compaction, bool using_zstd,int level=0) {
   assert(result);
 
   BlockContents contents;
@@ -143,7 +143,7 @@ Status ReadBlockFromFile(
       file, prefetch_buffer, footer, options, handle, &contents, ioptions,
       do_uncompress, maybe_compressed, block_type, uncompression_dict,
       cache_options, memory_allocator, nullptr, for_compaction);
-  Status s = block_fetcher.ReadBlockContents();
+  Status s = block_fetcher.ReadBlockContents(level);
   if (s.ok()) {
     result->reset(BlocklikeTraits<TBlocklike>::Create(
         std::move(contents), global_seqno, read_amp_bytes_per_bit,
@@ -2171,7 +2171,7 @@ Status BlockBasedTable::MaybeReadBlockAndLoadToCache(
             rep_->persistent_cache_options,
             GetMemoryAllocator(rep_->table_options),
             GetMemoryAllocatorForCompressedBlock(rep_->table_options));
-        s = block_fetcher.ReadBlockContents();
+        s = block_fetcher.ReadBlockContents(rep_->level);
         raw_block_comp_type = block_fetcher.get_compression_type();
         contents = &raw_block_contents;
       } else {
@@ -2474,7 +2474,7 @@ Status BlockBasedTable::RetrieveBlock(
             ? rep_->table_options.read_amp_bytes_per_bit
             : 0,
         GetMemoryAllocator(rep_->table_options), for_compaction,
-        rep_->blocks_definitely_zstd_compressed);
+        rep_->blocks_definitely_zstd_compressed,rep_->level);
   }
 
   if (!s.ok()) {

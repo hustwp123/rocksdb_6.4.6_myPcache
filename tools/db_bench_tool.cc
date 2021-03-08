@@ -3587,8 +3587,8 @@ class Benchmark {
           rc_cfg.writer_qdepth = 4;
           rc_cfg.writer_dispatch_size = 4 * 1024;
 
-          //auto pcache = std::make_shared<myCache>(rc_cfg);
-          auto pcache = std::make_shared<BlockCacheTier>(rc_cfg);
+          auto pcache = std::make_shared<myCache>(rc_cfg);
+          //auto pcache = std::make_shared<BlockCacheTier>(rc_cfg);
           block_based_options.persistent_cache = pcache;
           rc_status = pcache->Open();
         }

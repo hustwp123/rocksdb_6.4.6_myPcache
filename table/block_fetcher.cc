@@ -71,7 +71,7 @@ inline bool BlockFetcher::TryGetUncompressBlockFromPersistentCache() {
   if (cache_options_.persistent_cache &&
       !cache_options_.persistent_cache->IsCompressed()) {
     Status status = PersistentCacheHelper::LookupUncompressedPage(
-        cache_options_, handle_, contents_,file_->file_name());
+        cache_options_, handle_, contents_, file_->file_name());
     if (status.ok()) {
       // uncompressed page is found for the block handle
       return true;
@@ -111,7 +111,8 @@ inline bool BlockFetcher::TryGetCompressedBlockFromPersistentCache() {
     // lookup uncompressed cache mode p-cache
     std::unique_ptr<char[]> raw_data;
     status_ = PersistentCacheHelper::LookupRawPage(
-        cache_options_, handle_, &raw_data, block_size_ + kBlockTrailerSize,file_->file_name());
+        cache_options_, handle_, &raw_data, block_size_ + kBlockTrailerSize,
+        file_->file_name());
     if (status_.ok()) {
       heap_buf_ = CacheAllocationPtr(raw_data.release());
       used_buf_ = heap_buf_.get();
@@ -151,7 +152,8 @@ inline void BlockFetcher::InsertCompressedBlockToPersistentCacheIfNeeded() {
       cache_options_.persistent_cache->IsCompressed()) {
     // insert to raw cache
     PersistentCacheHelper::InsertRawPage(cache_options_, handle_, used_buf_,
-                                         block_size_ + kBlockTrailerSize,file_->file_name());
+                                         block_size_ + kBlockTrailerSize,
+                                         file_->file_name());
   }
 }
 
@@ -160,8 +162,8 @@ inline void BlockFetcher::InsertUncompressedBlockToPersistentCacheIfNeeded() {
       cache_options_.persistent_cache &&
       !cache_options_.persistent_cache->IsCompressed()) {
     // insert to uncompressed cache
-    PersistentCacheHelper::InsertUncompressedPage(cache_options_, handle_,
-                                                  *contents_,file_->file_name());
+    PersistentCacheHelper::InsertUncompressedPage(
+        cache_options_, handle_, *contents_, file_->file_name());
   }
 }
 
@@ -195,8 +197,73 @@ inline void BlockFetcher::GetBlockContents() {
 #endif
 }
 
-Status BlockFetcher::ReadBlockContents() {
+Status BlockFetcher::ReadBlockContents(int level) {
   block_size_ = static_cast<size_t>(handle_.size());
+  if (level < 2) {
+    if (TryGetFromPrefetchBuffer()) {
+      if (!status_.ok()) {
+        return status_;
+      }
+    }
+    PrepareBufferForBlockFromFile();
+    Status s;
+    {
+      PERF_TIMER_GUARD(block_read_time);
+      // Actual file read
+      status_ = file_->Read(handle_.offset(), block_size_ + kBlockTrailerSize,
+                            &slice_, used_buf_, for_compaction_);
+    }
+    PERF_COUNTER_ADD(block_read_count, 1);
+    // TODO: introduce dedicated perf counter for range tombstones
+    switch (block_type_) {
+      case BlockType::kFilter:
+        PERF_COUNTER_ADD(filter_block_read_count, 1);
+        break;
+
+      case BlockType::kCompressionDictionary:
+        PERF_COUNTER_ADD(compression_dict_block_read_count, 1);
+        break;
+
+      case BlockType::kIndex:
+        PERF_COUNTER_ADD(index_block_read_count, 1);
+        break;
+      // Nothing to do here as we don't have counters for the other types.
+      default:
+        break;
+    }
+
+    PERF_COUNTER_ADD(block_read_byte, block_size_ + kBlockTrailerSize);
+    if (!status_.ok()) {
+      return status_;
+    }
+
+    if (slice_.size() != block_size_ + kBlockTrailerSize) {
+      return Status::Corruption("truncated block read from " +
+                                file_->file_name() + " offset " +
+                                ToString(handle_.offset()) + ", expected " +
+                                ToString(block_size_ + kBlockTrailerSize) +
+                                " bytes, got " + ToString(slice_.size()));
+    }
+    CheckBlockChecksum();
+    PERF_TIMER_GUARD(block_decompress_time);
+
+    compression_type_ = get_block_compression_type(slice_.data(), block_size_);
+
+    if (do_uncompress_ && compression_type_ != kNoCompression) {
+      // compressed page, uncompress, update cache
+      UncompressionContext context(compression_type_);
+      UncompressionInfo info(context, uncompression_dict_, compression_type_);
+      status_ = UncompressBlockContents(info, slice_.data(), block_size_,
+                                        contents_, footer_.version(), ioptions_,
+                                        memory_allocator_);
+      compression_type_ = kNoCompression;
+    } else {
+      GetBlockContents();
+    }
+    return status_;
+  }
+
+  // level>=2
   if (TryGetUncompressBlockFromPersistentCache()) {
     compression_type_ = kNoCompression;
 #ifndef NDEBUG
