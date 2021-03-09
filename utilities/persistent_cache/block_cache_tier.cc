@@ -424,6 +424,7 @@ Status NewPersistentCache(Env* const env, const std::string& path,
 
 Status SST_space::Get(const std::string key, std::unique_ptr<char[]>* data,
                       size_t* size) {
+  MutexLock _(&lock);
   if (!cache.count(key)) {
     return Status::NotFound("Mycache not found");
   }
@@ -465,6 +466,7 @@ Status SST_space::Get(const std::string key, std::unique_ptr<char[]>* data,
   return Status::OK();
 }
 std::string SST_space::Get(std::string key) {
+  MutexLock _(&lock);
   if (!cache.count(key)) {
     return "";
   }
@@ -511,6 +513,7 @@ std::string SST_space::Get(std::string key) {
 
 Status SST_space::Put(const std::string key, const char* data,
                       const size_t size) {
+  MutexLock _(&lock);
   if (size == 0) {
     return Status::OK();
   }
@@ -521,6 +524,7 @@ Status SST_space::Put(const std::string key, const char* data,
     // printf("too large size=%ld\n", size);
     return Status::OK();
   }
+
   DLinkedNode* node;
   if (!cache.count(key))  // key不存在 创建新节点
   {
@@ -596,6 +600,7 @@ Status SST_space::Put(const std::string key, const char* data,
   return Status::OK();
 }
 void SST_space::Put(const std::string& key, const std::string& value) {
+  MutexLock _(&lock);
   // printf("put key size=%ld value size=%ld\n",key.size(),value.size());
   // printf("val==: %s\n",value.c_str());
   if (value.size() == 0) {
@@ -675,7 +680,7 @@ void SST_space::Put(const std::string& key, const std::string& value) {
 }
 Status myCache::InsertImpl(const Slice& key, const char* data,
                            const size_t size, std::string fname) {
-  MutexLock _(&lock_);
+  //MutexLock _(&lock_);
   fprintf(stderr, "myCache Insert size=%ld\n", size);
   std::string skey(key.data(), key.size());
   int index = getIndex(fname);
@@ -707,18 +712,19 @@ void myCache::InsertMain() {
 
 Status myCache::Lookup(const Slice& key, std::unique_ptr<char[]>* data,
                        size_t* size, std::string fname) {
-  MutexLock _(&lock_);
+  //MutexLock _(&lock_);
   // fprintf(stderr,"Lookup\n");
   std::string skey(key.data(), key.size());
   int index = getIndex(fname);
   Status s = v[index].Get(skey, data, size);
+
   return s;
 }
 
 Status myCache::Insert2(const std::string& key, const std::string& value,
                         std::string& fname) {
   // fprintf(stderr,"myCache Insert2 size=%ld\n",value.size());
-  MutexLock _(&lock_);
+  //MutexLock _(&lock_);
   int index = getIndex(fname);
   // fprintf(stderr,"index=%d\n NUM=%d",index,NUM);
   v[index].Put(key, value);
@@ -726,7 +732,7 @@ Status myCache::Insert2(const std::string& key, const std::string& value,
 }
 
 Status myCache::Open() {
-  MutexLock _(&lock_);
+  //MutexLock _(&lock_);
   std::string path = opt_.path;
   path += "/pcache_file";
   printf("paht=%s\n", path.c_str());
@@ -760,7 +766,7 @@ Status myCache::Open() {
   //   v[i].Set_Par(fp, opt_.cache_size / SPACE_SIZE, i * SST_SIZE);
   // }
   NUM = opt_.cache_size / SST_SIZE;
-  v.resize(NUM);
+  // v.resize(NUM);
   for (int i = 0; i < NUM; i++) {
     v[i].Set_Par(fd, SST_SIZE / SPACE_SIZE, i * SST_SIZE);
   }
@@ -770,7 +776,7 @@ Status myCache::Open() {
   return Status::OK();
 }
 Status myCache::Close() {
-  MutexLock _(&lock_);
+  //MutexLock _(&lock_);
   if (opt_.pipeline_writes && insert_th_.joinable()) {
     myInsertOp op(/*quit=*/true);
     insert_ops_.Push(std::move(op));

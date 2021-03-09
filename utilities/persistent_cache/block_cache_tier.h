@@ -190,7 +190,8 @@ class SST_space  // cache 管理单个SST所占空间
     tail->prev = head;
   }
   SST_space(int fd_, int num, int begin_)
-      : fd(fd_), begin(begin_), all_num(num), empty_num(num) {
+      : fd(fd_), begin(begin_), all_num(num), empty_num(num)
+      {
     bit_map.resize(num);
     bit_map.assign(num, 0);
     head = new DLinkedNode();
@@ -198,7 +199,7 @@ class SST_space  // cache 管理单个SST所占空间
     head->next = tail;
     tail->prev = head;
   }
-  ~SST_space() {
+  virtual ~SST_space() {
     delete head;
     delete tail;
   }
@@ -244,6 +245,7 @@ class SST_space  // cache 管理单个SST所占空间
   }
 
  private:
+  port::Mutex lock;
   int fd=-1;
   uint32_t begin;             //指向该SST空间起始位置
   std::vector<bool> bit_map;  // bitmap暂时用bool数组代替
@@ -330,14 +332,15 @@ class myCache : public PersistentCacheTier {
  private:
   BoundedQueue<myInsertOp> insert_ops_;  // Ops waiting for insert
   rocksdb::port::Thread insert_th_;      // Insert thread
-  port::Mutex lock_;                   // Synchronization
+  //port::Mutex lock_;                   // Synchronization
 
   int fd=-1;
   int NUM;
 
   const PersistentCacheConfig opt_;  // BlockCache options
 
-  std::vector<SST_space> v;
+  //std::vector<SST_space> v;
+  SST_space v[5250];
 };
 
 }  // namespace rocksdb
