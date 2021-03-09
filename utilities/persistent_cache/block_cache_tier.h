@@ -160,7 +160,7 @@ class BlockCacheTier : public PersistentCacheTier {
 //wp
 
 
-#define SST_SIZE (800 * 1024)  //单个SST所占空间 800KB
+#define SST_SIZE (8 * 1024*1024)  //单个SST所占空间 800KB
 #define SPACE_SIZE (4 * 1024)  //单个空间大小     4KB
 
 struct Record  // KV记录结构
@@ -344,7 +344,7 @@ class myCache : public PersistentCacheTier {
   const PersistentCacheConfig opt_;  // BlockCache options
 
   //std::vector<SST_space> v;
-  SST_space v[5250];
+  SST_space v[520];
 };
 
 

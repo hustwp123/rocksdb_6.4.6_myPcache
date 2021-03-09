@@ -22,23 +22,23 @@ class PersistentCacheHelper {
   // insert block into raw page cache
   static void InsertRawPage(const PersistentCacheOptions& cache_options,
                             const BlockHandle& handle, const char* data,
-                            const size_t size);
+                            const size_t size,std::string fname);
 
   // insert block into uncompressed cache
   static void InsertUncompressedPage(
       const PersistentCacheOptions& cache_options, const BlockHandle& handle,
-      const BlockContents& contents);
+      const BlockContents& contents,std::string fname);
 
   // lookup block from raw page cacge
   static Status LookupRawPage(const PersistentCacheOptions& cache_options,
                               const BlockHandle& handle,
                               std::unique_ptr<char[]>* raw_data,
-                              const size_t raw_data_size);
+                              const size_t raw_data_size,std::string fname);
 
   // lookup block from uncompressed cache
   static Status LookupUncompressedPage(
       const PersistentCacheOptions& cache_options, const BlockHandle& handle,
-      BlockContents* contents);
+      BlockContents* contents,std::string fname);
 };
 
 }  // namespace rocksdb
