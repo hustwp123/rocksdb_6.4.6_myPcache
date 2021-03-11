@@ -130,6 +130,7 @@ Status BlockCacheTier::Close() {
   // clear all metadata
   WriteLock _(&lock_);
   metadata_.Clear();
+  fprintf(stderr,"/n/n\n\nget_mem_time=%ld   get_file_time=%ld\n\n",get_mem_time,get_file_time);
   return Status::OK();
 }
 
@@ -265,6 +266,7 @@ Status BlockCacheTier::InsertImpl(const Slice& key, const Slice& data) {
 
 Status BlockCacheTier::Lookup(const Slice& key, std::unique_ptr<char[]>* val,
                               size_t* size,std::string) {
+  uint64_t now=Env::Default()->NowNanos();
   StopWatchNano timer(opt_.env, /*auto_start=*/ true);
 
   LBA lba;
@@ -273,6 +275,7 @@ Status BlockCacheTier::Lookup(const Slice& key, std::unique_ptr<char[]>* val,
   if (!status) {
     stats_.cache_misses_++;
     stats_.read_miss_latency_.Add(timer.ElapsedNanos() / 1000);
+    get_mem_time+=Env::Default()->NowNanos()-now;
     return Status::NotFound("blockcache: key not found");
   }
 
@@ -284,6 +287,9 @@ Status BlockCacheTier::Lookup(const Slice& key, std::unique_ptr<char[]>* val,
     stats_.read_miss_latency_.Add(timer.ElapsedNanos() / 1000);
     return Status::NotFound("blockcache: cache file not found");
   }
+
+  uint64_t now2=Env::Default()->NowNanos();
+  get_mem_time+=now2-now;
 
   assert(file->refs_);
 
@@ -309,6 +315,8 @@ Status BlockCacheTier::Lookup(const Slice& key, std::unique_ptr<char[]>* val,
   stats_.bytes_read_.Add(*size);
   stats_.cache_hits_++;
   stats_.read_hit_latency_.Add(timer.ElapsedNanos() / 1000);
+
+  get_file_time+=Env::Default()->NowNanos()-now2;
 
   return Status::OK();
 }
@@ -427,15 +435,19 @@ Status NewPersistentCache(Env* const env, const std::string& path,
 // wp
 
 Status SST_space::Get(const std::string key, std::unique_ptr<char[]>* data,
-                      size_t* size) {
+                      size_t* size,uint64_t &get_mem,uint64_t &get_file) {
+  uint64_t now=Env::Default()->NowNanos();
   MutexLock _(&lock);
   if (!cache.count(key)) {
+    get_mem+=Env::Default()->NowNanos()-now;
     return Status::NotFound("Mycache not found");
   }
   DLinkedNode* node = cache[key];
   moveToHead(node);
   data->reset(new char[node->value.size]);
   *size = node->value.size;
+  uint64_t now2=Env::Default()->NowNanos();
+  get_mem+=now2-now;
   size_t cur = 0;
   for (uint32_t i = 0; i < (node->value.offset.size() - 1); i++) {
     // fseek(fp, begin + node->value.offset[i], SEEK_SET);
@@ -467,6 +479,7 @@ Status SST_space::Get(const std::string key, std::unique_ptr<char[]>* data,
   // printf("get key size=%ld value size=%ld
   // node.size=%ld\n",key.size(),re.size(),node->value.size); printf("val==:
   // %s\n",re.c_str());
+  get_file+=Env::Default()->NowNanos()-now2;
   return Status::OK();
 }
 std::string SST_space::Get(std::string key) {
@@ -716,11 +729,13 @@ void myCache::InsertMain() {
 
 Status myCache::Lookup(const Slice& key, std::unique_ptr<char[]>* data,
                        size_t* size, std::string fname) {
+
+  //PERF_TIMER_GUARD(pcache_get_time);
   //MutexLock _(&lock_);
   // fprintf(stderr,"Lookup\n");
   std::string skey(key.data(), key.size());
   int index = getIndex(fname);
-  Status s = v[index].Get(skey, data, size);
+  Status s = v[index].Get(skey, data, size,get_mem_time,get_file_time);
 
   return s;
 }
@@ -787,6 +802,8 @@ Status myCache::Close() {
     insert_th_.join();
   }
   close(fd);
+
+  fprintf(stderr,"/n/n\n\nget_mem_time=%ld   get_file_time=%ld\n\n",get_mem_time,get_file_time);
   return Status::OK();
 }
 bool myCache::Erase(const Slice& key) {

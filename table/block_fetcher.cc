@@ -68,6 +68,7 @@ inline void BlockFetcher::CheckBlockChecksum() {
 }
 
 inline bool BlockFetcher::TryGetUncompressBlockFromPersistentCache() {
+  PERF_TIMER_GUARD(pcache_get_time);
   if (cache_options_.persistent_cache &&
       !cache_options_.persistent_cache->IsCompressed()) {
     Status status = PersistentCacheHelper::LookupUncompressedPage(
@@ -106,6 +107,7 @@ inline bool BlockFetcher::TryGetFromPrefetchBuffer() {
 }
 
 inline bool BlockFetcher::TryGetCompressedBlockFromPersistentCache() {
+  PERF_TIMER_GUARD(pcache_get_time);
   if (cache_options_.persistent_cache &&
       cache_options_.persistent_cache->IsCompressed()) {
     // lookup uncompressed cache mode p-cache

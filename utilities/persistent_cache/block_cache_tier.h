@@ -153,6 +153,10 @@ class BlockCacheTier : public PersistentCacheTier {
   BlockCacheTierMetadata metadata_;             // Cache meta data manager
   std::atomic<uint64_t> size_{0};               // Size of the cache
   Statistics stats_;                                 // Statistics
+
+
+  uint64_t get_mem_time=0;
+  uint64_t get_file_time=0;
 };
 
 
@@ -160,7 +164,7 @@ class BlockCacheTier : public PersistentCacheTier {
 //wp
 
 
-#define SST_SIZE (8 * 1024*1024)  //单个SST所占空间 800KB
+#define SST_SIZE (2 * 1024*1024)  //单个SST所占空间 800KB
 #define SPACE_SIZE (4 * 1024)  //单个空间大小     4KB
 
 struct Record  // KV记录结构
@@ -210,7 +214,7 @@ class SST_space  // cache 管理单个SST所占空间
 
   std::string Get(std::string key);
   Status Get(const std::string key, std::unique_ptr<char[]>* data,
-             size_t* size);
+             size_t* size,uint64_t &get_mem,uint64_t &get_file);
 
   void Put(const std::string &key, const std::string &value);
 
@@ -344,7 +348,11 @@ class myCache : public PersistentCacheTier {
   const PersistentCacheConfig opt_;  // BlockCache options
 
   //std::vector<SST_space> v;
-  SST_space v[520];
+  SST_space v[260];
+
+
+  uint64_t get_mem_time=0;
+  uint64_t get_file_time=0;
 };
 
 

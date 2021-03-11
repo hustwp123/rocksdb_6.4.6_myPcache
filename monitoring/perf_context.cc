@@ -529,6 +529,8 @@ std::string PerfContext::ToString(bool exclude_zero_counters) const {
   PERF_CONTEXT_BY_LEVEL_OUTPUT_ONE_COUNTER(bloom_filter_full_true_positive);
   PERF_CONTEXT_BY_LEVEL_OUTPUT_ONE_COUNTER(block_cache_hit_count);
   PERF_CONTEXT_BY_LEVEL_OUTPUT_ONE_COUNTER(block_cache_miss_count);
+
+  PERF_CONTEXT_OUTPUT(pcache_get_time);
   return ss.str();
 #endif
 }
