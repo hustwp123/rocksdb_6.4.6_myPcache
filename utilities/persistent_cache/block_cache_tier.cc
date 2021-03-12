@@ -515,11 +515,9 @@ Status SST_space::Put(const std::string key, const char* data,
   if (size == 0) {
     return Status::OK();
   }
-  // fprintf(stderr,"test1\n");
   uint32_t need_num = size / SPACE_SIZE;
   need_num += size % SPACE_SIZE == 0 ? 0 : 1;
   if (need_num > all_num) {
-    // printf("too large size=%ld\n", size);
     return Status::OK();
   }
 
@@ -549,7 +547,6 @@ Status SST_space::Put(const std::string key, const char* data,
       delete removed;
     }
   }
-  // fprintf(stderr,"test2\n");
   //取块
   uint32_t num = 0, j = 0;
   while (j < bit_map.size()) {
@@ -563,13 +560,9 @@ Status SST_space::Put(const std::string key, const char* data,
     }
     j++;
   }
-  // fprintf(stderr,"test3\n");
   //写块
   size_t cur = 0;
   for (uint32_t i = 0; i < node->value.offset.size() - 1; i++) {
-    // fseek(fp, begin + node->value.offset[i], SEEK_SET);
-    // fwrite(data + cur, SPACE_SIZE, 1, fp);
-
     ssize_t t =
         pwrite(fd, data + cur, SPACE_SIZE, begin + node->value.offset[i]);
     if (t < 0) {
@@ -577,15 +570,9 @@ Status SST_space::Put(const std::string key, const char* data,
     }
     cur += SPACE_SIZE;
   }
-  // fprintf(stderr,"test3.1\n");
   node->value.size = size;
   size_t left_size = size % SPACE_SIZE == 0 ? SPACE_SIZE : size % SPACE_SIZE;
-  // fprintf(stderr,"test3.2\n");
   int index = node->value.offset.size() - 1;
-  // fseek(fp, begin + node->value.offset[index], SEEK_SET);
-  // // fprintf(stderr,"test3.3  left_size=%ld cur=%ld
-  // // size=%ld\n",left_size,cur,size);
-  // fwrite(data + cur, left_size, 1, fp);
 
   ssize_t t =
       pwrite(fd, data + cur, left_size, begin + node->value.offset[index]);
@@ -593,22 +580,18 @@ Status SST_space::Put(const std::string key, const char* data,
     return Status::IOError();
   }
 
-  // fprintf(stderr,"test4\n");
   empty_num -= need_num;
   return Status::OK();
 }
 void SST_space::Put(const std::string& key, const std::string& value,
                     uint64_t& out,int ) {
   MutexLock _(&lock);
-  // printf("put key size=%ld value size=%ld\n",key.size(),value.size());
-  // printf("val==: %s\n",value.c_str());
   if (value.size() == 0) {
     return;
   }
   uint32_t need_num = value.size() / SPACE_SIZE;
   need_num += value.size() % SPACE_SIZE == 0 ? 0 : 1;
   if (need_num > all_num) {
-    // printf("too large size=%ld\n", value.size());
     return;
   }
   DLinkedNode* node;
@@ -620,12 +603,8 @@ void SST_space::Put(const std::string& key, const std::string& value,
     cache[key] = node;
     addToHead(node);
     while (need_num > empty_num) {
-      // fprintf(stderr,"need_num=%d empty_num=%d\n",need_num,empty_num);
-      // fprintf(stderr,"size=%ld \n",value.size());
-      // fprintf(stderr,"index=%d\n",index2);
       out++;
       DLinkedNode* removed = removeTail();
-      // printf("removed:%s\n", removed->key.c_str());
       cache.erase(removed->key);
       removeRecord(&(removed->value));
       delete removed;
@@ -658,9 +637,6 @@ void SST_space::Put(const std::string& key, const std::string& value,
   //写块
   size_t cur = 0;
   for (uint32_t i = 0; i < node->value.offset.size() - 1; i++) {
-    // fseek(fp, begin + node->value.offset[i], SEEK_SET);
-    // fwrite(value.c_str() + cur, SPACE_SIZE, 1, fp);
-
     ssize_t t = pwrite(fd, value.c_str() + cur, SPACE_SIZE,
                        begin + node->value.offset[i]);
     if (t < 0) {
@@ -672,9 +648,6 @@ void SST_space::Put(const std::string& key, const std::string& value,
   size_t left_size =
       value.size() % SPACE_SIZE == 0 ? SPACE_SIZE : value.size() % SPACE_SIZE;
   int index = node->value.offset.size() - 1;
-  // fseek(fp, begin + node->value.offset[index], SEEK_SET);
-  // fwrite(value.c_str() + cur, left_size, 1, fp);
-
   ssize_t t = pwrite(fd, value.c_str() + cur, left_size,
                      begin + node->value.offset[index]);
   if (t < 0) {
@@ -686,25 +659,16 @@ void SST_space::Put(const std::string& key, const std::string& value,
 Status myCache::InsertImpl(const Slice& key, const char* data,
                            const size_t size, std::string fname) {
   // MutexLock _(&lock_);
-  fprintf(stderr, "myCache Insert size=%ld\n", size);
   std::string skey(key.data(), key.size());
   int index = getIndex(fname);
-  // fprintf(stderr,"index=%d\n NUM=%d",index,NUM);
   Status s = v[index].Put(skey, data, size);
   return s;
 }
 
 Status myCache::Insert(const Slice& key, const char* data, const size_t size,
                        std::string fname) {
-  allnum++;
-
-  if (size < 4 * 1024) {
-    smallnum++;
-  } else {
-    bignum++;
-  }
-  Insert2(std::string(key.data(), key.size()), std::string(data, size), fname);
-  return Status::OK();
+  // Insert2(std::string(key.data(), key.size()), std::string(data, size), fname);
+  // return Status::OK();
   if (opt_.pipeline_writes) {
     insert_ops_.Push(myInsertOp(
         key.ToString(), std::move(std::string(data, size)), std::move(fname)));
@@ -727,7 +691,6 @@ void myCache::InsertMain() {
 Status myCache::Lookup(const Slice& key, std::unique_ptr<char[]>* data,
                        size_t* size, std::string fname) {
   // MutexLock _(&lock_);
-  // fprintf(stderr,"Lookup\n");
   std::string skey(key.data(), key.size());
   int index = getIndex(fname);
   Status s = v[index].Get(skey, data, size);
@@ -737,15 +700,13 @@ Status myCache::Lookup(const Slice& key, std::unique_ptr<char[]>* data,
 
 Status myCache::Insert2(const std::string& key, const std::string& value,
                         std::string& fname) {
-  // fprintf(stderr,"myCache Insert2 size=%ld\n",value.size());
   // MutexLock _(&lock_);
   int index = getIndex(fname, true);
-  // fprintf(stderr,"index=%d\n NUM=%d",index,NUM);
   v[index].Put(key, value, outall,index);
   return Status::OK();
 }
 
-int myCache::getIndex(std::string fname, bool stat) {
+int myCache::getIndex(std::string fname, bool ) {
   if (fname.size() == 0) {
     return 0;
   }
@@ -767,22 +728,6 @@ int myCache::getIndex(std::string fname, bool stat) {
     sum = sum * 10 + fname[i] - '0';
     i++;
   }
-  // if(stat)
-  // {
-  //   fprintf(fp2,"%d\n",sum);
-  // }
-  // else
-  // {
-  //   fprintf(fp,"%d\n",sum);
-  // }
-
-  if(stat)
-  {
-    fprintf(fp2,"%d\n",sum);
-    // fprintf(stderr,"%s\n",fname.c_str());
-    // fprintf(stderr,"NUM=%d",NUM);
-    // fprintf(stderr,"sum=%d,sum NUM=%d\n",sum,(int)(sum%NUM));
-  }
 
   return sum % NUM;
 }
@@ -792,11 +737,10 @@ Status myCache::Open() {
   std::string path = opt_.path;
   path += "/pcache_file";
   // std::string path2 = path + "Get_sst";
-   std::string path3 = path + "Put_sst";
-  // printf("paht=%s\n", path.c_str());
+   //std::string path3 = path + "Put_sst";
   
   // fp = fopen(path2.c_str(), "w+");
-   fp2 = fopen(path3.c_str(), "w+");
+   //fp2 = fopen(path3.c_str(), "w+");
   fd = open(path.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0777);
   lseek(fd, opt_.cache_size, SEEK_SET);
   int t = -1;
@@ -805,27 +749,6 @@ Status myCache::Open() {
     return Status::IOError();
   }
 
-  // fp = fopen(path.c_str(), "w+");
-  // if (fp == NULL) {
-  //   printf("error open\n");
-  //   return Status::IOError();
-  // }
-  // int re = fseek(fp, opt_.cache_size, SEEK_SET);
-  // if (re != 0) {
-  //   printf("error seek\n");
-  //   return Status::IOError();
-  // }
-  // int t = -1;
-  // re = fwrite(&t, sizeof(int), 1, fp);
-  // if (re <= 0) {
-  //   printf("error write\n");
-  //   return Status::IOError();
-  // }
-  // NUM = 1;
-  // v.resize(NUM);
-  // for (int i = 0; i < NUM; i++) {
-  //   v[i].Set_Par(fp, opt_.cache_size / SPACE_SIZE, i * SST_SIZE);
-  // }
   NUM = opt_.cache_size / SST_SIZE;
   // v.resize(NUM);
   for (int i = 0; i < NUM; i++) {
@@ -845,25 +768,15 @@ Status myCache::Close() {
   }
   close(fd);
   // fclose(fp);
-   fclose(fp2);
+   //fclose(fp2);
   uint64_t all_empty_num=0;
   for(int i=0;i<NUM;i++)
   {
     all_empty_num+=v[i].empty_num;
-    if(v[i].empty_num<200)
-    {
-      fprintf(stderr,"small empty %d\n",i);
-    }
-    if(v[i].empty_num==0)
-    {
-      fprintf(stderr,"no empty %d\n",i);
-    }
   }
 
   fprintf(stderr,"/n/n\n all_empty_num=%ld \n",all_empty_num);
   fprintf(stderr, "/n/n\n outall=%ld\n", outall);
-  fprintf(stderr, "allnum=%ld smallnum=%ld  bignum=%ld\n", allnum, smallnum,
-          bignum);
   return Status::OK();
 }
 bool myCache::Erase(const Slice& key) {
