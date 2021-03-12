@@ -160,7 +160,7 @@ class BlockCacheTier : public PersistentCacheTier {
 //wp
 
 
-#define SST_SIZE (16 * 1024*1024)  //单个SST所占空间 800KB
+#define SST_SIZE (2 * 1024*1024)  //单个SST所占空间 800KB
 #define SPACE_SIZE (4 * 1024)  //单个空间大小     4KB
 
 struct Record  // KV记录结构
@@ -212,7 +212,7 @@ class SST_space  // cache 管理单个SST所占空间
   Status Get(const std::string key, std::unique_ptr<char[]>* data,
              size_t* size);
 
-  void Put(const std::string &key, const std::string &value);
+  void Put(const std::string &key, const std::string &value,uint64_t&,int);
 
   Status Put(const std::string key, const char* data, const size_t size);
 
@@ -225,6 +225,7 @@ class SST_space  // cache 管理单个SST所占空间
     }
     record->offset.clear();
     empty_num += free_num;
+    //fprintf(stderr,"in removeRecord empty_num=%d\n",empty_num);
   }
   void addToHead(DLinkedNode* node) {
     node->prev = head;
@@ -248,7 +249,7 @@ class SST_space  // cache 管理单个SST所占空间
     return node;
   }
 
- private:
+ public:
   port::Mutex lock;
   int fd=-1;
   uint32_t begin;             //指向该SST空间起始位置
@@ -290,40 +291,9 @@ class myCache : public PersistentCacheTier {
   };
 
   int getIndex(
-      std::string fname)  // filename 格式一般为 /.../0000123.sst
+      std::string fname,bool stat=false);  // filename 格式一般为 /.../0000123.sst
                           // 此处使用sst序号作为index，若非该格式 则放入最后
-  {
-    if (fname.size() == 0) {
-      return 0;
-    }
-    int i = fname.size() - 1;
-    while (fname[i] != '.') {
-      i--;
-    }
-    i--;
-    int j=i;
-    int sum = 0;
-    while (fname[i] >= '0' && fname[i] <= '9' && i >= 0) {
-
-      i--;
-    }
-    i++;
-    while(fname[i]=='0')
-    {
-      i++;
-    }
-    while(j>=i)
-    {
-            sum = sum * 10 + fname[i] - '0';
-            i++;
-    }
-    // if(stat)
-    // {
-    //   fprintf(fp,"%d\n",sum);
-    // }
-    
-    return sum % NUM;
-  }
+  
 
  public:
   void InsertMain();
@@ -361,6 +331,16 @@ class myCache : public PersistentCacheTier {
 
   //std::vector<SST_space> v;
   SST_space v[260];
+
+
+
+
+  uint64_t outnum=0;
+  uint64_t outall=0;
+  FILE* fp,*fp2;
+  uint64_t allnum=0;
+  uint64_t smallnum=0;
+  uint64_t bignum=0;
 };
 
 

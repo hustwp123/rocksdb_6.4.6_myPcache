@@ -81,6 +81,8 @@ using GFLAGS_NAMESPACE::ParseCommandLineFlags;
 using GFLAGS_NAMESPACE::RegisterFlagValidator;
 using GFLAGS_NAMESPACE::SetUsageMessage;
 
+#define KEYNUM 10000000
+
 DEFINE_string(
     benchmarks,
     "fillseq,"
@@ -3587,8 +3589,8 @@ class Benchmark {
           rc_cfg.writer_qdepth = 4;
           rc_cfg.writer_dispatch_size = 4 * 1024;
 
-          //auto pcache = std::make_shared<BlockCacheTier>(rc_cfg);
-          auto pcache = std::make_shared<myCache>(rc_cfg);
+          auto pcache = std::make_shared<BlockCacheTier>(rc_cfg);
+          //auto pcache = std::make_shared<myCache>(rc_cfg);
           block_based_options.persistent_cache = pcache;
           rc_status = pcache->Open();
         }
@@ -4150,7 +4152,7 @@ class Benchmark {
 
       for (int64_t j = 0; j < entries_per_batch_; j++) {
         int64_t rand_num = key_gens[id]->Next();
-        GenerateKeyFromInt(rand_num, FLAGS_num, &key);
+        GenerateKeyFromInt(rand_num, KEYNUM, &key);
         if (use_blob_db_) {
 #ifndef ROCKSDB_LITE
           Slice val = gen.Generate(value_size_);
@@ -4182,7 +4184,7 @@ class Benchmark {
           if (FLAGS_expand_range_tombstones) {
             for (int64_t offset = 0; offset < range_tombstone_width_;
                  ++offset) {
-              GenerateKeyFromInt(begin_num + offset, FLAGS_num,
+              GenerateKeyFromInt(begin_num + offset, KEYNUM,
                                  &expanded_keys[offset]);
               if (use_blob_db_) {
 #ifndef ROCKSDB_LITE
@@ -4197,8 +4199,8 @@ class Benchmark {
               }
             }
           } else {
-            GenerateKeyFromInt(begin_num, FLAGS_num, &begin_key);
-            GenerateKeyFromInt(begin_num + range_tombstone_width_, FLAGS_num,
+            GenerateKeyFromInt(begin_num, KEYNUM, &begin_key);
+            GenerateKeyFromInt(begin_num + range_tombstone_width_, KEYNUM,
                                &end_key);
             if (use_blob_db_) {
 #ifndef ROCKSDB_LITE
@@ -4644,7 +4646,7 @@ class Benchmark {
     do {
       for (int i = 0; i < 100; ++i) {
         int64_t key_rand = thread->rand.Next() & (pot - 1);
-        GenerateKeyFromInt(key_rand, FLAGS_num, &key);
+        GenerateKeyFromInt(key_rand, KEYNUM, &key);
         ++read;
         auto status = db->Get(options, key, &value);
         if (status.ok()) {
@@ -4683,7 +4685,7 @@ class Benchmark {
     uint64_t rand_int = rand->Next();
     int64_t key_rand;
     if (read_random_exp_range_ == 0) {
-      key_rand = rand_int % FLAGS_num;
+      key_rand = rand_int % KEYNUM;
     } else {
       const uint64_t kBigInt = static_cast<uint64_t>(1U) << 62;
       long double order = -static_cast<long double>(rand_int % kBigInt) /
@@ -4691,11 +4693,11 @@ class Benchmark {
                           read_random_exp_range_;
       long double exp_ran = std::exp(order);
       uint64_t rand_num =
-          static_cast<int64_t>(exp_ran * static_cast<long double>(FLAGS_num));
+          static_cast<int64_t>(exp_ran * static_cast<long double>(KEYNUM));
       // Map to a different number to avoid locality.
       const uint64_t kBigPrime = 0x5bd1e995;
       // Overflow is like %(2^64). Will have little impact of results.
-      key_rand = static_cast<int64_t>((rand_num * kBigPrime) % FLAGS_num);
+      key_rand = static_cast<int64_t>((rand_num * kBigPrime) % KEYNUM);
     }
     return key_rand;
   }
@@ -4717,14 +4719,15 @@ class Benchmark {
       // We use same key_rand as seed for key and column family so that we can
       // deterministically find the cfh corresponding to a particular key, as it
       // is done in DoWrite method.
-      GenerateKeyFromInt(key_rand, FLAGS_num, &key);
+      //fprintf(stderr,"FLAGS_num:%ld\n",FLAGS_num);
+      GenerateKeyFromInt(key_rand, KEYNUM, &key);
       if (entries_per_batch_ > 1 && FLAGS_multiread_stride) {
         if (++num_keys == entries_per_batch_) {
           num_keys = 0;
           key_rand = GetRandomKey(&thread->rand);
           if ((key_rand + (entries_per_batch_ - 1) * FLAGS_multiread_stride) >=
-              FLAGS_num) {
-            key_rand = FLAGS_num - entries_per_batch_ * FLAGS_multiread_stride;
+              KEYNUM) {
+            key_rand = KEYNUM - entries_per_batch_ * FLAGS_multiread_stride;
           }
         } else {
           key_rand += FLAGS_multiread_stride;
@@ -4797,16 +4800,16 @@ class Benchmark {
       if (FLAGS_multiread_stride) {
         int64_t key = GetRandomKey(&thread->rand);
         if ((key + (entries_per_batch_ - 1) * FLAGS_multiread_stride) >=
-            static_cast<int64_t>(FLAGS_num)) {
-          key = FLAGS_num - entries_per_batch_ * FLAGS_multiread_stride;
+            static_cast<int64_t>(KEYNUM)) {
+          key = KEYNUM - entries_per_batch_ * FLAGS_multiread_stride;
         }
         for (int64_t i = 0; i < entries_per_batch_; ++i) {
-          GenerateKeyFromInt(key, FLAGS_num, &keys[i]);
+          GenerateKeyFromInt(key, KEYNUM, &keys[i]);
           key += FLAGS_multiread_stride;
         }
       } else {
         for (int64_t i = 0; i < entries_per_batch_; ++i) {
-          GenerateKeyFromInt(GetRandomKey(&thread->rand), FLAGS_num, &keys[i]);
+          GenerateKeyFromInt(GetRandomKey(&thread->rand), KEYNUM, &keys[i]);
         }
       }
       if (!FLAGS_multiread_batched) {
@@ -4972,12 +4975,12 @@ class Benchmark {
     while (!duration.Done(1)) {
       DBWithColumnFamilies* db_with_cfh = SelectDBWithCfh(thread);
       int64_t rand_v, key_rand, key_seed;
-      rand_v = GetRandomKey(&thread->rand) % FLAGS_num;
-      double u = static_cast<double>(rand_v) / FLAGS_num;
+      rand_v = GetRandomKey(&thread->rand) % KEYNUM;
+      double u = static_cast<double>(rand_v) / KEYNUM;
       key_seed = PowerCdfInversion(u, FLAGS_key_dist_a, FLAGS_key_dist_b);
       Random64 rand(key_seed);
-      key_rand = static_cast<int64_t>(rand.Next()) % FLAGS_num;
-      GenerateKeyFromInt(key_rand, FLAGS_num, &key);
+      key_rand = static_cast<int64_t>(rand.Next()) % KEYNUM;
+      GenerateKeyFromInt(key_rand, KEYNUM, &key);
       int query_type = query.GetType(rand_v);
 
       // change the qps
@@ -5156,20 +5159,20 @@ class Benchmark {
     Duration duration(FLAGS_duration, reads_);
     char value_buffer[256];
     while (!duration.Done(1)) {
-      int64_t seek_pos = thread->rand.Next() % FLAGS_num;
-      GenerateKeyFromIntForSeek(static_cast<uint64_t>(seek_pos), FLAGS_num,
+      int64_t seek_pos = thread->rand.Next() % KEYNUM;
+      GenerateKeyFromIntForSeek(static_cast<uint64_t>(seek_pos), KEYNUM,
                                 &key);
       if (FLAGS_max_scan_distance != 0) {
         if (FLAGS_reverse_iterator) {
           GenerateKeyFromInt(
               static_cast<uint64_t>(std::max(
                   static_cast<int64_t>(0), seek_pos - FLAGS_max_scan_distance)),
-              FLAGS_num, &lower_bound);
+              KEYNUM, &lower_bound);
           options.iterate_lower_bound = &lower_bound;
         } else {
           auto min_num =
               std::min(FLAGS_num, seek_pos + FLAGS_max_scan_distance);
-          GenerateKeyFromInt(static_cast<uint64_t>(min_num), FLAGS_num,
+          GenerateKeyFromInt(static_cast<uint64_t>(min_num), KEYNUM,
                              &upper_bound);
           options.iterate_upper_bound = &upper_bound;
         }
@@ -5267,8 +5270,8 @@ class Benchmark {
       DB* db = SelectDB(thread);
       batch.Clear();
       for (int64_t j = 0; j < entries_per_batch_; ++j) {
-        const int64_t k = seq ? i + j : (thread->rand.Next() % FLAGS_num);
-        GenerateKeyFromInt(k, FLAGS_num, &key);
+        const int64_t k = seq ? i + j : (thread->rand.Next() % KEYNUM);
+        GenerateKeyFromInt(k, KEYNUM, &key);
         batch.Delete(key);
       }
       auto s = db->Write(write_options_, &batch);
@@ -5348,7 +5351,7 @@ class Benchmark {
         }
       }
 
-      GenerateKeyFromInt(thread->rand.Next() % FLAGS_num, FLAGS_num, &key);
+      GenerateKeyFromInt(thread->rand.Next() % KEYNUM, KEYNUM, &key);
       Status s;
 
       if (write_merge == kWrite) {
@@ -5585,7 +5588,7 @@ class Benchmark {
     // the number of iterations is the larger of read_ or write_
     while (!duration.Done(1)) {
       DB* db = SelectDB(thread);
-      GenerateKeyFromInt(thread->rand.Next() % FLAGS_num, FLAGS_num, &key);
+      GenerateKeyFromInt(thread->rand.Next() % KEYNUM, KEYNUM, &key);
       if (get_weight == 0 && put_weight == 0) {
         // one batch completed, reinitialize for next batch
         get_weight = FLAGS_readwritepercent;
@@ -5639,7 +5642,7 @@ class Benchmark {
     // the number of iterations is the larger of read_ or write_
     while (!duration.Done(1)) {
       DB* db = SelectDB(thread);
-      GenerateKeyFromInt(thread->rand.Next() % FLAGS_num, FLAGS_num, &key);
+      GenerateKeyFromInt(thread->rand.Next() % KEYNUM, KEYNUM, &key);
 
       auto status = db->Get(options, key, &value);
       if (status.ok()) {
@@ -5690,7 +5693,7 @@ class Benchmark {
     // the number of iterations is the larger of read_ or write_
     while (!duration.Done(1)) {
       DB* db = SelectDB(thread);
-      GenerateKeyFromInt(thread->rand.Next() % FLAGS_num, FLAGS_num, &key);
+      GenerateKeyFromInt(thread->rand.Next() % KEYNUM, KEYNUM, &key);
 
       auto status = db->Get(options, key, &existing_value);
       if (status.ok()) {
@@ -5740,7 +5743,7 @@ class Benchmark {
     Duration duration(FLAGS_duration, readwrites_);
     while (!duration.Done(1)) {
       DB* db = SelectDB(thread);
-      GenerateKeyFromInt(thread->rand.Next() % FLAGS_num, FLAGS_num, &key);
+      GenerateKeyFromInt(thread->rand.Next() % KEYNUM, KEYNUM, &key);
 
       auto status = db->Get(options, key, &value);
       if (status.ok()) {
@@ -5900,7 +5903,7 @@ class Benchmark {
     std::unique_ptr<const char[]> key_guard;
     Slice key = AllocateKey(&key_guard);
     for (int64_t i = 0; i < FLAGS_num; ++i) {
-      GenerateKeyFromInt(i, FLAGS_num, &key);
+      GenerateKeyFromInt(i, KEYNUM, &key);
       iter->Seek(key);
       assert(iter->Valid() && iter->key() == key);
       thread->stats.FinishedOps(nullptr, db, 1, kSeek);
@@ -5911,7 +5914,7 @@ class Benchmark {
         } else {
           iter->Prev();
         }
-        GenerateKeyFromInt(++i, FLAGS_num, &key);
+        GenerateKeyFromInt(++i, KEYNUM, &key);
         assert(iter->Valid() && iter->key() == key);
         thread->stats.FinishedOps(nullptr, db, 1, kSeek);
       }
@@ -6039,7 +6042,7 @@ class Benchmark {
     Status s;
     DB* db = SelectDB(thread);
     for (int64_t i = 0; i < FLAGS_numdistinct; i++) {
-      GenerateKeyFromInt(i * max_counter, FLAGS_num, &key);
+      GenerateKeyFromInt(i * max_counter, KEYNUM, &key);
       s = db->Put(write_options_, key, gen.Generate(value_size_));
       if (!s.ok()) {
         fprintf(stderr, "Operation failed: %s\n", s.ToString().c_str());
@@ -6057,13 +6060,13 @@ class Benchmark {
       int64_t rnd_id = static_cast<int64_t>(distribution(generator));
       int64_t key_id = std::max(std::min(FLAGS_numdistinct - 1, rnd_id),
                                 static_cast<int64_t>(0));
-      GenerateKeyFromInt(key_id * max_counter + counters[key_id], FLAGS_num,
+      GenerateKeyFromInt(key_id * max_counter + counters[key_id], KEYNUM,
                          &key);
       s = FLAGS_use_single_deletes ? db->SingleDelete(write_options_, key)
                                    : db->Delete(write_options_, key);
       if (s.ok()) {
         counters[key_id] = (counters[key_id] + 1) % max_counter;
-        GenerateKeyFromInt(key_id * max_counter + counters[key_id], FLAGS_num,
+        GenerateKeyFromInt(key_id * max_counter + counters[key_id], KEYNUM,
                            &key);
         s = db->Put(write_options_, key, Slice());
       }
@@ -6114,7 +6117,7 @@ class Benchmark {
       // Pick a Iterator to use
 
       int64_t key_id = thread->rand.Next() % FLAGS_key_id_range;
-      GenerateKeyFromInt(key_id, FLAGS_num, &key);
+      GenerateKeyFromInt(key_id, KEYNUM, &key);
       // Reset last 8 bytes to 0
       char* start = const_cast<char*>(key.data());
       start += key.size() - 8;
@@ -6188,7 +6191,7 @@ class Benchmark {
 
       uint64_t key_id = thread->rand.Next() % FLAGS_key_id_range;
       // Write key id
-      GenerateKeyFromInt(key_id, FLAGS_num, &key);
+      GenerateKeyFromInt(key_id, KEYNUM, &key);
       // Write timestamp
 
       char* start = const_cast<char*>(key.data());

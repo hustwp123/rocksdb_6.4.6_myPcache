@@ -133,7 +133,7 @@ Status BlockCacheTier::Close() {
   return Status::OK();
 }
 
-template<class T>
+template <class T>
 void Add(std::map<std::string, double>* stats, const std::string& key,
          const T& t) {
   stats->insert({key, static_cast<double>(t)});
@@ -149,8 +149,7 @@ PersistentCache::StatsType BlockCacheTier::Stats() {
       stats_.bytes_read_.Average());
   Add(&stats, "persistentcache.blockcachetier.insert_dropped",
       stats_.insert_dropped_);
-  Add(&stats, "persistentcache.blockcachetier.cache_hits",
-      stats_.cache_hits_);
+  Add(&stats, "persistentcache.blockcachetier.cache_hits", stats_.cache_hits_);
   Add(&stats, "persistentcache.blockcachetier.cache_misses",
       stats_.cache_misses_);
   Add(&stats, "persistentcache.blockcachetier.cache_errors",
@@ -172,7 +171,7 @@ PersistentCache::StatsType BlockCacheTier::Stats() {
 }
 
 Status BlockCacheTier::Insert(const Slice& key, const char* data,
-                              const size_t size,std::string) {
+                              const size_t size, std::string) {
   // update stats
   stats_.bytes_pipelined_.Add(size);
 
@@ -222,7 +221,7 @@ Status BlockCacheTier::InsertImpl(const Slice& key, const Slice& data) {
   assert(data.size());
   assert(cache_file_);
 
-  StopWatchNano timer(opt_.env, /*auto_start=*/ true);
+  StopWatchNano timer(opt_.env, /*auto_start=*/true);
 
   WriteLock _(&lock_);
 
@@ -264,8 +263,8 @@ Status BlockCacheTier::InsertImpl(const Slice& key, const Slice& data) {
 }
 
 Status BlockCacheTier::Lookup(const Slice& key, std::unique_ptr<char[]>* val,
-                              size_t* size,std::string) {
-  StopWatchNano timer(opt_.env, /*auto_start=*/ true);
+                              size_t* size, std::string) {
+  StopWatchNano timer(opt_.env, /*auto_start=*/true);
 
   LBA lba;
   bool status;
@@ -327,10 +326,9 @@ Status BlockCacheTier::NewCacheFile() {
   TEST_SYNC_POINT_CALLBACK("BlockCacheTier::NewCacheFile:DeleteDir",
                            (void*)(GetCachePath().c_str()));
 
-  std::unique_ptr<WriteableCacheFile> f(
-    new WriteableCacheFile(opt_.env, &buffer_allocator_, &writer_,
-                           GetCachePath(), writer_cache_id_,
-                           opt_.cache_file_size, opt_.log));
+  std::unique_ptr<WriteableCacheFile> f(new WriteableCacheFile(
+      opt_.env, &buffer_allocator_, &writer_, GetCachePath(), writer_cache_id_,
+      opt_.cache_file_size, opt_.log));
 
   bool status = f->Create(opt_.enable_direct_writes, opt_.enable_direct_reads);
   if (!status) {
@@ -419,10 +417,6 @@ Status NewPersistentCache(Env* const env, const std::string& path,
   *cache = pcache;
   return s;
 }
-
-
-
-
 
 // wp
 
@@ -603,7 +597,8 @@ Status SST_space::Put(const std::string key, const char* data,
   empty_num -= need_num;
   return Status::OK();
 }
-void SST_space::Put(const std::string& key, const std::string& value) {
+void SST_space::Put(const std::string& key, const std::string& value,
+                    uint64_t& out,int ) {
   MutexLock _(&lock);
   // printf("put key size=%ld value size=%ld\n",key.size(),value.size());
   // printf("val==: %s\n",value.c_str());
@@ -625,6 +620,10 @@ void SST_space::Put(const std::string& key, const std::string& value) {
     cache[key] = node;
     addToHead(node);
     while (need_num > empty_num) {
+      // fprintf(stderr,"need_num=%d empty_num=%d\n",need_num,empty_num);
+      // fprintf(stderr,"size=%ld \n",value.size());
+      // fprintf(stderr,"index=%d\n",index2);
+      out++;
       DLinkedNode* removed = removeTail();
       // printf("removed:%s\n", removed->key.c_str());
       cache.erase(removed->key);
@@ -636,6 +635,7 @@ void SST_space::Put(const std::string& key, const std::string& value) {
     moveToHead(node);
     removeRecord(&(node->value));
     while (need_num > empty_num) {
+      out++;
       DLinkedNode* removed = removeTail();
       cache.erase(removed->key);
       removeRecord(&(removed->value));
@@ -681,10 +681,11 @@ void SST_space::Put(const std::string& key, const std::string& value) {
     return;
   }
   empty_num -= need_num;
+  
 }
 Status myCache::InsertImpl(const Slice& key, const char* data,
                            const size_t size, std::string fname) {
-  //MutexLock _(&lock_);
+  // MutexLock _(&lock_);
   fprintf(stderr, "myCache Insert size=%ld\n", size);
   std::string skey(key.data(), key.size());
   int index = getIndex(fname);
@@ -695,6 +696,15 @@ Status myCache::InsertImpl(const Slice& key, const char* data,
 
 Status myCache::Insert(const Slice& key, const char* data, const size_t size,
                        std::string fname) {
+  allnum++;
+
+  if (size < 4 * 1024) {
+    smallnum++;
+  } else {
+    bignum++;
+  }
+  Insert2(std::string(key.data(), key.size()), std::string(data, size), fname);
+  return Status::OK();
   if (opt_.pipeline_writes) {
     insert_ops_.Push(myInsertOp(
         key.ToString(), std::move(std::string(data, size)), std::move(fname)));
@@ -716,7 +726,7 @@ void myCache::InsertMain() {
 
 Status myCache::Lookup(const Slice& key, std::unique_ptr<char[]>* data,
                        size_t* size, std::string fname) {
-  //MutexLock _(&lock_);
+  // MutexLock _(&lock_);
   // fprintf(stderr,"Lookup\n");
   std::string skey(key.data(), key.size());
   int index = getIndex(fname);
@@ -728,18 +738,65 @@ Status myCache::Lookup(const Slice& key, std::unique_ptr<char[]>* data,
 Status myCache::Insert2(const std::string& key, const std::string& value,
                         std::string& fname) {
   // fprintf(stderr,"myCache Insert2 size=%ld\n",value.size());
-  //MutexLock _(&lock_);
-  int index = getIndex(fname);
+  // MutexLock _(&lock_);
+  int index = getIndex(fname, true);
   // fprintf(stderr,"index=%d\n NUM=%d",index,NUM);
-  v[index].Put(key, value);
+  v[index].Put(key, value, outall,index);
   return Status::OK();
 }
 
+int myCache::getIndex(std::string fname, bool stat) {
+  if (fname.size() == 0) {
+    return 0;
+  }
+  int i = fname.size() - 1;
+  while (fname[i] != '.') {
+    i--;
+  }
+  i--;
+  int j = i;
+  int sum = 0;
+  while (fname[i] >= '0' && fname[i] <= '9' && i >= 0) {
+    i--;
+  }
+  i++;
+  while (fname[i] == '0') {
+    i++;
+  }
+  while (j >= i) {
+    sum = sum * 10 + fname[i] - '0';
+    i++;
+  }
+  // if(stat)
+  // {
+  //   fprintf(fp2,"%d\n",sum);
+  // }
+  // else
+  // {
+  //   fprintf(fp,"%d\n",sum);
+  // }
+
+  if(stat)
+  {
+    fprintf(fp2,"%d\n",sum);
+    // fprintf(stderr,"%s\n",fname.c_str());
+    // fprintf(stderr,"NUM=%d",NUM);
+    // fprintf(stderr,"sum=%d,sum NUM=%d\n",sum,(int)(sum%NUM));
+  }
+
+  return sum % NUM;
+}
+
 Status myCache::Open() {
-  //MutexLock _(&lock_);
+  // MutexLock _(&lock_);
   std::string path = opt_.path;
   path += "/pcache_file";
-  printf("paht=%s\n", path.c_str());
+  // std::string path2 = path + "Get_sst";
+   std::string path3 = path + "Put_sst";
+  // printf("paht=%s\n", path.c_str());
+  
+  // fp = fopen(path2.c_str(), "w+");
+   fp2 = fopen(path3.c_str(), "w+");
   fd = open(path.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0777);
   lseek(fd, opt_.cache_size, SEEK_SET);
   int t = -1;
@@ -780,13 +837,33 @@ Status myCache::Open() {
   return Status::OK();
 }
 Status myCache::Close() {
-  //MutexLock _(&lock_);
+  // MutexLock _(&lock_);
   if (opt_.pipeline_writes && insert_th_.joinable()) {
     myInsertOp op(/*quit=*/true);
     insert_ops_.Push(std::move(op));
     insert_th_.join();
   }
   close(fd);
+  // fclose(fp);
+   fclose(fp2);
+  uint64_t all_empty_num=0;
+  for(int i=0;i<NUM;i++)
+  {
+    all_empty_num+=v[i].empty_num;
+    if(v[i].empty_num<200)
+    {
+      fprintf(stderr,"small empty %d\n",i);
+    }
+    if(v[i].empty_num==0)
+    {
+      fprintf(stderr,"no empty %d\n",i);
+    }
+  }
+
+  fprintf(stderr,"/n/n\n all_empty_num=%ld \n",all_empty_num);
+  fprintf(stderr, "/n/n\n outall=%ld\n", outall);
+  fprintf(stderr, "allnum=%ld smallnum=%ld  bignum=%ld\n", allnum, smallnum,
+          bignum);
   return Status::OK();
 }
 bool myCache::Erase(const Slice& key) {
@@ -801,7 +878,6 @@ bool myCache::Reserve(const size_t size) {
 bool myCache::IsCompressed() { return opt_.is_compressed; }
 
 std::string myCache::GetPrintableOptions() const { return opt_.ToString(); }
-
 
 }  // namespace rocksdb
 
